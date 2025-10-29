@@ -1,0 +1,82 @@
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 120px);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+form {
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px #c5defa;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.input-container input {
+    width: 100%;
+    padding-left: 30px;
+    height: 36px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.input-container .input-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    fill: #999;
+}
+
+input[type="submit"] {
+    width: 80%;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+form p.olvidado {
+    width: 75%;
+    text-align: right;
+    margin-bottom: 12px;
+}
+
+form p.olvidado a {
+    font-size: 0.8rem;
+}
+
+form h2 {
+    margin-bottom: 8px;
+}
+
+form p {
+    color: grey;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+form .iniciar {
+    margin-bottom: 12px;
+}

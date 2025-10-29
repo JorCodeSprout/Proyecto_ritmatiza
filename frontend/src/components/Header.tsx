@@ -1,132 +1,77 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-// Si usas React Router, necesitarías usar 'Link' en lugar de 'a' y 'useNavigate' en los botones
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-// === ESTILOS ===
-const headerStyles: React.CSSProperties = {
-    padding: '10px 20px',
-    borderBottom: '2px solid #c5defa',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '20px',
-    backgroundColor: 'whitesmoke', // Aunque tu CSS no lo define, 'body' lo sugiere
-};
-
-const logoImageStyles: React.CSSProperties = {
-    height: '50px',
-};
-
-const navMenuStyles: React.CSSProperties = {
-    flex: 1, 
-    display: 'flex',
-    justifyContent: 'center',
-};
-
-const ulStyles: React.CSSProperties = {
-    display: 'flex',
-    listStyle: 'none',
-    gap: '30px',
-    margin: '0',
-    padding: '0',
-};
-
-// Estilos base para los enlaces (simulando :hover con estado)
-const linkBaseStyles: React.CSSProperties = {
-    textDecoration: 'none',
-    color: '#333',
-    fontWeight: 'bold',
-    transition: 'color 0.3s',
-};
-
-const accesoStyles: React.CSSProperties = {
-    display: 'flex',
-    gap: '10px',
-};
-
-// Estilos base para los botones
-const buttonBaseStyles: React.CSSProperties = {
-    padding: '8px 16px',
-    border: 'none',
-    cursor: 'pointer',
-    borderRadius: '10px',
-    transition: 'background-color 0.3s, color 0.3s', // Añadimos transición para hover
-};
-
-const iniciarButtonStyles: React.CSSProperties = {
-    ...buttonBaseStyles,
-    backgroundColor: '#007bff',
-    color: 'white',
-};
-
-const registroButtonStyles: React.CSSProperties = {
-    ...buttonBaseStyles,
-    backgroundColor: '#c5defa',
-    color: '#007bff',
-};
-// === FIN ESTILOS ===
+const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px">
+        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+    </svg>
+);
 
 
 const Header: React.FC = () => {
-    const [hoveredLink, setHoveredLink] = React.useState<string | null>(null);
     const navigate = useNavigate();
+    const {isLogged, logout} = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    }
 
     const menuItems = [
-        { id: 'inicio', name: 'Inicio', href: '/' },
-        { id: 'tareas', name: 'Tareas', href: '/tareas' },
-        { id: 'musica', name: 'Música y Playlist', href: '/musica' },
-        { id: 'acerca', name: 'Acerca de', href: '/acerca' },
-        { id: 'contacto', name: 'Contacto', href: '/contacto' },
+        { id: 'inicio', name: 'Inicio', href: '/', requiresAuth: false },
+        { id: 'tareas', name: 'Tareas', href: '/tareas', requiresAuth: true },
+        { id: 'musica', name: 'Música y Playlist', href: '/musica', requiresAuth: true },
+        { id: 'acerca', name: 'Acerca de', href: '/acerca', requiresAuth: false },
+        { id: 'contacto', name: 'Contacto', href: '/contacto', requiresAuth: false },
     ];
 
+    const menuLinksAMostrar = menuItems.filter(enlace => !enlace.requiresAuth || isLogged);
+
     return (
-        <header style={headerStyles}>
+        <header>
             {/* Logo */}
-            <a href="/">
+            <Link to="/">
                 <img 
                     src="../public/images/RITMATIZA.png"
                     alt="logo" 
                     title="logo"
-                    style={logoImageStyles}
                 />
-            </a>
+            </Link>
 
             {/* Menú de Navegación */}
-            <nav style={navMenuStyles}>
-                <ul style={ulStyles}>
-                    {menuItems.map((item) => (
+            <nav className='menu'>
+                <ul>
+                    {menuLinksAMostrar.map((item) => (
                         <li key={item.id} id={item.id}>
-                            <a 
-                                href={item.href} 
-                                style={{
-                                    ...linkBaseStyles,
-                                    // Simula el hover: cambia color si el ratón está encima
-                                    color: hoveredLink === item.id ? '#007bff' : '#333'
-                                }}
-                                onMouseEnter={() => setHoveredLink(item.id)}
-                                onMouseLeave={() => setHoveredLink(null)}
-                            >
+                            <Link to={item.href}>
                                 {item.name}
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </ul>
             </nav>
 
             {/* Botones de Acceso */}
-            <div id="acceso" style={accesoStyles}>
-                <button 
-                    style={iniciarButtonStyles}
-                    onClick={() => navigate('/login')}
-                >
-                    Iniciar sesión
-                </button>
-                <button 
-                    style={registroButtonStyles}
-                    onClick={() => navigate('/register')}
-                >
-                    Registrarse
-                </button>
+            <div id="acceso">
+                {isLogged ? (
+                    <>
+                        <button onClick={handleLogout} className='cerrar'>
+                            Cerrar sesión
+                        </button>
+                        <Link to='/perfil' title='Ver perfil' className='user-icon'>
+                            <UserIcon  fill='#1a3a5a' />
+                        </Link>
+                    </>
+                ) : <>
+                    <button onClick={() => navigate('/login')} className='iniciar'>
+                        Iniciar sesión
+                    </button>
+                    <button onClick={() => navigate('/register')}  className='registro'>
+                        Registrarse
+                    </button>
+                </>
+                }
             </div>
         </header>
     );

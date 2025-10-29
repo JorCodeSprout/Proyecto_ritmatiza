@@ -1,87 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://127.0.0.1/api';
-
-// === ESTILOS ESPECÍFICOS DEL FORMULARIO ===
-const formStyles: React.CSSProperties = {
-    padding: '40px 30px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 20px #c5defa',
-    width: '100%',
-    maxWidth: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    backgroundColor: 'white', // Añadido para que el formulario destaque sobre whitesmoke
-};
-
-const inputContainerStyles: React.CSSProperties = {
-    position: 'relative',
-    marginBottom: '10px',
-    width: '100%',
-    maxWidth: '300px',
-};
-
-const inputBaseStyles: React.CSSProperties = {
-    width: '100%',
-    paddingLeft: '30px',
-    height: '36px',
-    boxSizing: 'border-box',
-    fontSize: '14px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-};
-
-const iconStyles: React.CSSProperties = {
-    position: 'absolute',
-    left: '8px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-    fill: '#999',
-};
-
-const submitButtonBaseStyles: React.CSSProperties = {
-    width: '80%',
-    height: '36px', // Ajustado a la altura del input
-    border: 'none',
-    cursor: 'pointer',
-    borderRadius: '10px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    transition: 'background-color 0.3s',
-};
-
-const iniciarButtonStyles: React.CSSProperties = {
-    ...submitButtonBaseStyles,
-    backgroundColor: '#007bff',
-    color: 'white',
-    marginBottom: '12px',
-};
-
-const registroButtonStyles: React.CSSProperties = {
-    ...submitButtonBaseStyles,
-    backgroundColor: '#c5defa',
-    color: '#007bff',
-    marginBottom: '0',
-};
-
-const olvidadoStyles: React.CSSProperties = {
-    width: '75%',
-    textAlign: 'right',
-    marginBottom: '12px',
-    fontSize: '0.8rem',
-};
-
-const textStyles: React.CSSProperties = {
-    color: 'grey',
-    fontSize: '0.9rem',
-    marginTop: '4px',
-    marginBottom: '12px',
-};
 
 // SVG icons (convertidos a React components por claridad)
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -97,7 +18,7 @@ const LockIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 interface LoginFormProps {
-    onLoginSuccess: (token: string) => void;
+    onLoginSuccess: (token: string, name: string) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
@@ -119,12 +40,10 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
             });
 
             const token = response.data.access_token;
+            const userName = response.data.user.name;
 
-            if(token) {
-                localStorage.setItem('jwt_token', token);
-
-                onLoginSuccess(token);
-                navigate('/');
+            if(token && userName) {
+                onLoginSuccess(token, userName);
             }else {
                 setError('Respuesta inválida del servidor')
             }            
@@ -141,21 +60,20 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
     };
 
     return (
-        <form style={formStyles} onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <h2>Bienvenido</h2>
-            <p style={textStyles}>Inicia sesión para solicitar una canción</p>
+            <p>Inicia sesión para solicitar una canción</p>
 
             {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
 
             {/* Input Correo */}
-            <div style={inputContainerStyles}>
-                <UserIcon style={iconStyles} fill="#999" />
+            <div className='input-container'>
+                <UserIcon className='input-icon' />
                 <input 
                     type="email" 
                     name="correo" 
                     id="correo" 
                     placeholder="Correo corporativo" 
-                    style={inputBaseStyles}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
@@ -164,14 +82,13 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
             </div>
 
             {/* Input Contraseña */}
-            <div style={inputContainerStyles}>
-                <LockIcon style={iconStyles} fill="#999" />
+            <div className='input-container'>
+                <LockIcon className='input-icon' fill="#999" />
                 <input 
                     type="password" 
                     name="clave" 
                     id="clave" 
                     placeholder="Contraseña" 
-                    style={inputBaseStyles}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -180,27 +97,27 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
             </div>
 
             {/* Enlace Olvidado */}
-            <p style={olvidadoStyles}>
-                <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}>
+            <p className='olvidado'>
+                <Link to="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}>
                     ¿Olvidaste tu contraseña?
-                </a>
+                </Link>
             </p>
 
-            {/* Botón Iniciar Sesión (submit principal) */}
+            {/* Botón Iniciar Sesión */}
             <button 
                 type="submit" 
-                style={iniciarButtonStyles} 
+                className='iniciar' 
                 disabled={loading}
             >
-                Iniciar sesión
+                {loading ? 'Iniciando...' : 'Iniciar sesión'}
             </button>
 
-            <p style={textStyles}>¿No tienes una cuenta?</p>
+            <p>¿No tienes una cuenta?</p>
 
-            {/* Botón Registrarse (para navegar a registro) */}
+            {/* Botón Registrarse */}
             <button 
-                type="button" // Cambiado a 'button' para evitar doble submit
-                style={registroButtonStyles}
+                type="button"
+                className='registro'
                 onClick={() => navigate('/register')}
                 disabled={loading}
             >
