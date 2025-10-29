@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://127.0.0.1/api';
+const API_URL = 'https://ritmatiza.local/api';
 
 // SVG icons (convertidos a React components por claridad)
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (

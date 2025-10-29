@@ -54,9 +54,10 @@
 ./frontend/*.sw?
 ### --- FIN FRONTEND --- ###
 
-./.env
-./.gitignore
-./PRUEBAS_POSTMAN.md
-./.start.bat
-./Los
-./Acceso
+.env
+.gitignore
+PRUEBAS_POSTMAN.md
+.start.bat
+Los
+Acceso
+certs/

@@ -2,7 +2,7 @@ import React, { useEffect, useState, type ReactNode } from "react";
 import { AuthContext, type AuthContextType } from "./AuthTypes";
 
 // Duración de la sesión --> 30min
-const DURACION = 30 * 60 * 100;
+const DURACION = 30 * 60 * 1000;
 const TOKEN_KEY = 'authToken';
 const EXPIRACION_KEY = 'authExpiry';
 
