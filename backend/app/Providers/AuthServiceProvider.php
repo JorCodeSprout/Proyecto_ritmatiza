@@ -26,12 +26,12 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // 1. Gate: Solo para el rol ADMIN
-        Gate::define('admin-only', fn (User $user) => $user->role === 'ADMIN');
+        Gate::define('admin-only', fn (User $user) => $user->isAdmin());
 
         // 2. Gate: Para PROFESOR o ADMIN (Usado para crear y calificar Tareas)
-        Gate::define('profesor-or-admin', fn (User $user) => in_array($user->role, ['PROFESOR', 'ADMIN']));
+        Gate::define('profesor-or-admin', fn (User $user) => $user->isProfesor());
 
         // 3. Gate: Para ESTUDIANTE o ADMIN (Usado para subir entregas, sugerir canciones)
-        Gate::define('estudiante-or-admin', fn (User $user) => in_array($user->role, ['ESTUDIANTE', 'ADMIN']));
+        Gate::define('estudiante-or-admin', fn (User $user) => $user->isEstudiante() || $user->isAdmin());
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -12,11 +12,15 @@ const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 const Header: React.FC = () => {
     const navigate = useNavigate();
     const {isLogged, logout} = useAuth();
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
         navigate('/');
     }
+
+    const paginaLogin = location.pathname === '/login';
+    const paginaRegister = location.pathname === '/register';
 
     const menuItems = [
         { id: 'inicio', name: 'Inicio', href: '/', requiresAuth: false },
@@ -63,15 +67,20 @@ const Header: React.FC = () => {
                             <UserIcon  fill='#1a3a5a' />
                         </Link>
                     </>
-                ) : <>
-                    <button onClick={() => navigate('/login')} className='iniciar'>
-                        Iniciar sesión
-                    </button>
-                    <button onClick={() => navigate('/register')}  className='registro'>
-                        Registrarse
-                    </button>
-                </>
-                }
+                ) : (
+                    <>
+                    {!paginaLogin && ( 
+                        <button onClick={() => navigate('/login')} className='iniciar'>
+                            Iniciar sesión
+                        </button>
+                    )}
+                    {!paginaRegister && (
+                        <button onClick={() => navigate('/register')}  className='registro'>
+                            Registrarse
+                        </button>
+                    )}
+                    </>
+                )}
             </div>
         </header>
     );

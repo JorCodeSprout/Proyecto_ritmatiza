@@ -1,10 +1,21 @@
 import { createContext } from "react";
 
+interface User {
+    email: string;
+    name: string;
+    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN'; 
+    puntos: number;
+    profesor_id: number | null; 
+}
+
 export interface AuthContextType {
     isLogged: boolean;
     token: string | null;
     userName: string | null;
-    login: (newToken: string, name: string) => void;
+    puntos: number | null;
+    profesorId: User["profesor_id"];
+
+    login: (newToken: string, user: User) => void; 
     logout: () => void;
 }
 

@@ -10,7 +10,7 @@ const footerTextStyles: React.CSSProperties = {
 
 const Footer: React.FC = () => {
     return (
-        <footer style={{ width: '100%', marginTop: 'auto', padding: '10px 20px' }}>
+        <footer style={{ width: '100%', padding: '0'}}>
             <p style={footerTextStyles}>
                 &copy; 2025 RITMATIZA. Todos los derechos reservados.
             </p>

@@ -1,51 +1,60 @@
-main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 120px);
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-}
-
 form {
-    padding: 40px 30px;
+    margin: 20px;
+    padding: 20px 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px #c5defa;
+    box-shadow: 0 15px 20px #3B9AFF;
     width: 100%;
     max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    background-color: white;
+    color: black;
 }
 
 .input-container {
     position: relative;
-    margin-bottom: 10px;
+    margin-top: 20px;
     width: 100%;
     max-width: 300px;
+    margin-bottom: 2px;
 }
 
 .input-container input {
     width: 100%;
-    padding-left: 30px;
-    height: 36px;
-    box-sizing: border-box;
+    padding: 10px 10px 10px 5px;
     font-size: 14px;
+    margin-bottom: 10px;
+
+    display: block;
+    outline: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid grey;
 }
 
-.input-container .input-icon {
+.input-container input:focus~label,
+.input-container input:not(:placeholder-shown) ~ label {
+    border-width: 2px;
+    top: -18px;
+    font-size: 12px;
+    color: #3B9AFF;
+}
+
+.input-container input:focus {
+    border-width: 2px;
+    border-color: #3B9AFF;
+}
+
+.input-container label {
     position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    fill: #999;
+    left: 5px;
+    top: 8px;
+}
+
+.term-container {
+    margin-bottom: 20px;
 }
 
 input[type="submit"] {

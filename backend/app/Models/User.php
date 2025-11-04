@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Tarea;
 use App\Models\Entrega;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * @use HasFactory<\Database\Factories\UserFactory>
+ * @property string $role
+ */
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -52,6 +57,24 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected function role(): Attribute {
+        return Attribute::make(
+            set: fn(string $value) => strtoupper($value)
+        );
+    }
+
+    public function isAdmin(): bool {
+        return $this->role === "ADMIN";
+    }
+
+    public function isProfesor(): bool {
+        return $this->role === "PROFESOR" ||$this->role === "ADMIN";
+    }
+
+    public function isEstudiante(): bool {
+        return $this->role === "ESTUDIANTE";
     }
 
     public function profesor(): BelongsTo {

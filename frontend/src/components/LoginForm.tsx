@@ -4,21 +4,16 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const API_URL = 'https://ritmatiza.local/api';
 
-// SVG icons (convertidos a React components por claridad)
-const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
-        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-    </svg>
-);
-
-const LockIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
-        <path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/>
-    </svg>
-);
+interface User {
+    email: string;
+    name: string;
+    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
+    puntos: number; 
+    profesor_id: number | null; // Este campo se pasa a onLoginSuccess
+}
 
 interface LoginFormProps {
-    onLoginSuccess: (token: string, name: string) => void;
+    onLoginSuccess: (token: string, user: User) => void; 
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
@@ -40,13 +35,15 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
             });
 
             const token = response.data.access_token;
-            const userName = response.data.user.name;
+            // Se asume que la respuesta del backend tiene user: { ..., profesor_id: X }
+            const userObject: User = response.data.user; 
 
-            if(token && userName) {
-                onLoginSuccess(token, userName);
+            if(token && userObject) {
+                // Se ejecuta el callback de éxito, pasando el objeto user completo
+                onLoginSuccess(token, userObject); 
             }else {
-                setError('Respuesta inválida del servidor')
-            }            
+                setError('Respuesta inválida del servidor');
+            }
         } catch(err) {
             if(axios.isAxiosError(err) && err.response && err.response.status === 401) {
                 setError('Credenciales incorrectas. Inténtalo de nuevo');
@@ -68,42 +65,41 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
 
             {/* Input Correo */}
             <div className='input-container'>
-                <UserIcon className='input-icon' />
                 <input 
                     type="email" 
                     name="correo" 
                     id="correo" 
-                    placeholder="Correo corporativo" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required 
+                    required
+                    placeholder=' '
+                    pattern='^.+@ritmatiza\.local$'
                     disabled={loading}
                 />
+                <label htmlFor="correo">Correo corporativo</label>
             </div>
 
             {/* Input Contraseña */}
             <div className='input-container'>
-                <LockIcon className='input-icon' fill="#999" />
                 <input 
                     type="password" 
                     name="clave" 
-                    id="clave" 
-                    placeholder="Contraseña" 
+                    id="clave"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    placeholder=' ' 
                     disabled={loading}
                 />
+                <label htmlFor="clave">Contraseña</label>
             </div>
 
-            {/* Enlace Olvidado */}
             <p className='olvidado'>
                 <Link to="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}>
                     ¿Olvidaste tu contraseña?
                 </Link>
             </p>
 
-            {/* Botón Iniciar Sesión */}
             <button 
                 type="submit" 
                 className='iniciar' 
@@ -114,7 +110,6 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
 
             <p>¿No tienes una cuenta?</p>
 
-            {/* Botón Registrarse */}
             <button 
                 type="button"
                 className='registro'

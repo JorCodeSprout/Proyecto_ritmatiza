@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Home from "./pages/Home";
 import { AuthProvider } from "./contexts/AuthContext";
+import RegisterPage from "./pages/RegisterPage";
+import AcercaDePage from "./pages/AcercaDePage";
 
 export default function App() {
   return (
@@ -10,6 +12,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/login" element={<LoginPage/>} />
+          <Route path="/register" element={<RegisterPage/>} />
+          <Route path="/acerca" element={<AcercaDePage/>} />
         </Routes>
       </Router>
     </AuthProvider>

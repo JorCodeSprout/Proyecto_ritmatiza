@@ -58,10 +58,10 @@ class AuthController extends Controller {
             'puntos' => 0
         ]);
 
-        return response()->json([
-            'message' => 'Usuario registrado exitosamente',
-            'user' => $user
-        ], 201);
+        $credenciales = $request->only('email', 'password');
+        $token = Auth::guard('api')->attempt($credenciales);
+
+        return $this->respondWithToken($token, $user);
     }
 
     public function logout() {

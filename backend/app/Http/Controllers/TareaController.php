@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TareaController extends Controller {
     public function __construct() {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['ultimasTareas']]);
     }
 
     // METODOS PARA PROFESOR/ADMIN
@@ -99,6 +99,15 @@ class TareaController extends Controller {
         return response()->json(['message' => 'Entrega calificada y puntos entregados', 'entrega' => $entrega], 200);
     }
 
+    public function ultimasTareas() {
+        $tareas = Tarea::with('creador')
+            ->latest()
+            ->limit(3)
+            ->get();
+            
+        return response()->json($tareas); 
+    }
+
     public function entregasPorTarea(Tarea $tarea) {
         if(Gate::denies('profesor-or-admin')) {
             return response()->json(['error' => 'No tienes permiso para ver todas las entregas'], 403);
@@ -111,5 +120,49 @@ class TareaController extends Controller {
     public function misEntregas() {
         $entregas = Auth::user()->entregas()->with('tarea')->get();
         return response()->json($entregas);
+    }
+
+    /**
+     * Obtiene las últimas 3 tareas creadas por un profesor específico.
+     * @param int $profesorId El ID del profesor.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTareasByProfesor(int $profesorId)
+    {
+        $estudianteId = Auth::id();
+
+        try {
+            $tareas = Tarea::where('creador_id', $profesorId) 
+                ->latest()
+                ->limit(3)
+                ->when($estudianteId, function ($query) use ($estudianteId) {
+                    $query->with(['entregas' => function ($q) use ($estudianteId) {
+                        $q->where('estudiante_id', $estudianteId)
+                            ->latest() 
+                            ->limit(1);
+                    }]);
+                })
+                ->get();
+
+            $tareasConEstado = $tareas->map(function ($tarea) {
+                $entrega = $tarea->entregas->first(); 
+
+                $tareaArray = $tarea->toArray();
+                
+                $tareaArray['estado_entrega'] = $entrega ? $entrega->estado : 'PENDIENTE'; 
+                $tareaArray['entrega_id'] = $entrega ? $entrega->id : null; 
+                unset($tareaArray['entregas']);
+
+                return $tareaArray;
+            });
+
+            return response()->json($tareasConEstado, 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'No se pudieron recuperar las tareas.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

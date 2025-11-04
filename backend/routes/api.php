@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MusicaController;
 use App\Http\Controllers\SpotifyAuthController;
+use App\Http\Controllers\SpotifyTokenController;
 use App\Http\Controllers\TareaController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,10 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register')->name('register');
     Route::post('login', 'login')->name('login');
 });
+
+Route::get('tareas/ultimas', [TareaController::class, 'ultimasTareas']);
+Route::get('tareas/profesor/{profesorId}', [TareaController::class, 'getTareasByProfesor']);
+Route::get('spotify_token', [SpotifyTokenController::class, 'getSpotifyToken']);
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(AuthController::class)->group(function () {
@@ -29,7 +34,9 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::controller(MusicaController::class)->prefix('musica')->group(function () {
-        Route::get('playlist', 'getPlaylsit');
+        // Corregido: 'getPlaylsit' -> 'getPlaylist'
+        Route::get('playlist', 'getPlaylist'); 
+        // Rutas para Alumnos/Profesores/Admin
         Route::post('sugerir', 'sugerirCancion');
         Route::get('buscar-spotify', 'buscarSpotify');
     });
@@ -45,6 +52,7 @@ Route::middleware('auth:api')->group(function () {
             Route::post('entregas/{entrega}/calificar', 'calificarEntrega');
         });
 
+        // Ruta para ver TODAS las sugerencias
         Route::get('musica/sugerencias', [MusicaController::class, 'listado']);
     });
 
@@ -54,6 +62,14 @@ Route::middleware('auth:api')->group(function () {
             Route::get('callback', 'callback');
         });
 
-        Route::post('playlist/add', [MusicaController::class, 'anadirPlaylist']);
+        // Administracion de Playlist:
+        // 1. Aceptar Sugerencia (Añadir a playlist)
+        Route::post('musica/playlist/add', [MusicaController::class, 'anadirPlaylist']);
+
+        // 2. Eliminar cancion de playlist (Eliminacion fisica)
+        Route::delete('musica/playlist/eliminar', [MusicaController::class, 'eliminarCancionPlaylist']);
+
+        // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
+        Route::post('musica/sugerencias/cancelar', [MusicaController::class, 'cancelarSugerencia']);
     });
 });
