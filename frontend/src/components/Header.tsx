@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -48,9 +48,9 @@ const Header: React.FC = () => {
                 <ul>
                     {menuLinksAMostrar.map((item) => (
                         <li key={item.id} id={item.id}>
-                            <Link to={item.href}>
+                            <NavLink to={item.href} className={({isActive}) => (isActive ? 'marcado' : '')}>
                                 {item.name}
-                            </Link>
+                            </NavLink>
                         </li>
                     ))}
                 </ul>

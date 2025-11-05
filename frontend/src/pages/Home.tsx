@@ -62,7 +62,6 @@ const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap'];
 const TOKEN_REFRESH_INTERNAL = (59 * 60 + 30) * 1000; 
 
 const Home: React.FC = () => {
-    // CAMBIO CLAVE 1: Usar 'profesorId' (camelCase) conforme a AuthContextType
     const { isLogged, userName, puntos, profesorId, token } = useAuth(); 
 
     const [ultimasTareas, setUltimasTareas] = useState<Tarea[]>([]);
@@ -345,16 +344,13 @@ const Home: React.FC = () => {
                         )}
                         
                         {!isLoadingTareas && !errorTareas && ultimasTareas.map((tarea, index) => (
-                            // El linter ve que 'index' se usa aquí
                             <div key={tarea.id} className={`grid-item bloque-tarea-item-${index + 1} task-card card-base`}>
-                                {/* Contenido principal de la tarjeta */}
                                 <div className='task-content'>
                                     <div className='task-info-v2'>
                                         <h3 className='task-title-v2'>{tarea.titulo}</h3>
                                         <p className='task-description-v2'>{tarea.descripcion}</p>
                                     </div>
                                     
-                                    {/* Detalles en el pie de la tarjeta */}
                                     <div className='task-footer-v2'>
                                         <p className='task-reward-v2'>
                                             🏅 Puntos: {tarea.recompensa}
@@ -365,7 +361,6 @@ const Home: React.FC = () => {
                                     </div>
                                 </div>
                                 
-                                {/* Enlace de acción */}
                                 <Link to={`/tarea/${tarea.id}`} className="task-link-v2">
                                     Ver Tarea
                                 </Link>

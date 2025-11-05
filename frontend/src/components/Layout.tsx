@@ -5,9 +5,10 @@ import '../assets/styles/general.css';
 
 interface LayoutProps {
     children: React.ReactNode;
+    includeFooter?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, includeFooter = true }) => {
     return (
         <div id='body'>
             <Header />
@@ -16,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {children}
             </main>
 
-            <Footer />
+            {includeFooter && <Footer />}
         </div>
     );
 }

@@ -61,3 +61,6 @@ Los
 Acceso
 certs/
 node_modules
+composer.json
+composer.lock
+vendor

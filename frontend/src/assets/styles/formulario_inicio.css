@@ -35,7 +35,9 @@ form {
 }
 
 .input-container input:focus~label,
-.input-container input:not(:placeholder-shown) ~ label {
+.input-container input:not(:placeholder-shown) ~ label,
+textarea:focus ~ label,
+textarea:not(:placeholder-shown) ~ label {
     border-width: 2px;
     top: -18px;
     font-size: 12px;
@@ -88,4 +90,22 @@ form p {
 
 form .iniciar {
     margin-bottom: 12px;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px 10px 10px 5px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: block;
+    outline: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid grey;
+    resize: none;
 }

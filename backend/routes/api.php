@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MusicaController;
 use App\Http\Controllers\SpotifyAuthController;
 use App\Http\Controllers\SpotifyTokenController;
@@ -16,6 +17,8 @@ Route::controller(AuthController::class)->group(function () {
 Route::get('tareas/ultimas', [TareaController::class, 'ultimasTareas']);
 Route::get('tareas/profesor/{profesorId}', [TareaController::class, 'getTareasByProfesor']);
 Route::get('spotify_token', [SpotifyTokenController::class, 'getSpotifyToken']);
+Route::post("contacto", [ContactController::class, "send"]);
+
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(AuthController::class)->group(function () {
