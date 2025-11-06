@@ -1,94 +1,104 @@
-import React, { useEffect, useState, type ReactNode } from "react";
-import { AuthContext, type AuthContextType } from "./AuthTypes";
+import React, { useState, useEffect } from 'react';
+import { AuthContext, type AuthContextType } from "./AuthTypes.ts"; 
 
-// Definición de la interfaz User para el tipado local (se recomienda importarla si están en archivos separados)
-interface User {
-    email: string;
-    name: string;
-    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN'; 
-    puntos: number; 
-    profesor_id: number | null; 
-}
+const initialAuthState: Omit<AuthContextType, 'login' | 'logout' | 'setUserData'> = {
+    id: null,
+    email: null,
+    userName: null,
+    role: null,
+    puntos: null,
+    profesorId: null,
+    isLogged: false,
+    token: null,
+    loadingAuth: true,
+};
 
-// Duración de la sesión --> 30min
-const DURACION = 30 * 60 * 1000;
-const TOKEN_KEY = 'authToken';
-const EXPIRACION_KEY = 'authExpiry';
-const USER_NAME_KEY = 'userName';
-const USER_POINTS_KEY = 'userPuntos'; 
+const storageKey = 'userAuthData';
 
-export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
-    const [token, setToken] = useState<string | null>(null);
-    const [userName, setUserName] = useState<string | null>(null);
-    const [puntos, setPuntos] = useState<number | null>(null);
-    const [profesorId, setProfesorId] = useState<number | null>(null);
-    const isLogged = !!token;
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [authState, setAuthState] = useState(initialAuthState);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem(TOKEN_KEY);
-        const storedExpiry = localStorage.getItem(EXPIRACION_KEY);
-        const storedUserName = localStorage.getItem(USER_NAME_KEY);
-        const storedPuntos = localStorage.getItem(USER_POINTS_KEY); 
-        const now = Date.now();
+        const loadInitialState = () => {
+            try {
+                const storedData = localStorage.getItem(storageKey);
+                if (storedData) {
+                    const { token, ...userData } = JSON.parse(storedData);
+                    
+                    if (token) {
+                        setAuthState(prev => ({
+                            ...prev,
+                            ...userData,
+                            token,
+                            isLogged: true,
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar el estado de autenticación:", error);
+                localStorage.removeItem(storageKey);
+            } finally {
+                setAuthState(prev => ({ ...prev, loadingAuth: false }));
+            }
+        };
 
-        if(storedToken && storedExpiry && now < Number(storedExpiry)) {
-            setToken(storedToken);
-            setUserName(storedUserName);
-            setPuntos(storedPuntos ? Number(storedPuntos) : 0);
-        } else {
-            localStorage.removeItem(TOKEN_KEY);
-            localStorage.removeItem(EXPIRACION_KEY);
-            localStorage.removeItem(USER_NAME_KEY);
-            localStorage.removeItem(USER_POINTS_KEY);
-        }
+        loadInitialState();
     }, []);
 
-    const login = (newToken: string, user: User) => {
-        const expiryTime = Date.now() + DURACION;
-        localStorage.setItem(TOKEN_KEY, newToken);
-        localStorage.setItem(EXPIRACION_KEY, expiryTime.toString());
-        localStorage.setItem(USER_NAME_KEY, user.name);
-        localStorage.setItem(USER_POINTS_KEY, user.puntos.toString()); 
+    const login: AuthContextType['login'] = (newToken, user) => {
+        const fullData = { 
+            id: user.id,
+            email: user.email,
+            userName: user.name,
+            role: user.role,
+            puntos: user.puntos,
+            profesorId: user.profesor_id,
+            token: newToken 
+        };
+        
+        setAuthState(prev => ({
+            ...prev,
+            ...fullData,
+            isLogged: true,
+            loadingAuth: false,
+        }));
+        
+        localStorage.setItem(storageKey, JSON.stringify(fullData));
+    };
 
-        setToken(newToken);
-        setUserName(user.name);
-        setPuntos(user.puntos);
-        setProfesorId(user.profesor_id)
-    }
+    const logout: AuthContextType['logout'] = () => {
+        setAuthState({
+            ...initialAuthState,
+            loadingAuth: false,
+        });
+        localStorage.removeItem(storageKey);
+    };
 
-    const logout = () => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(EXPIRACION_KEY);
-        localStorage.removeItem(USER_NAME_KEY);
-        localStorage.removeItem(USER_POINTS_KEY); 
-        setToken(null);
-        setUserName(null);
-        setPuntos(null);
-    }
+    const setUserData: AuthContextType['setUserData'] = (newUserData) => {
+        setAuthState(prev => {
+            const newState = { 
+                ...prev, 
+                ...newUserData,
+                role: newUserData.role !== undefined ? newUserData.role : prev.role,
+            };
 
-    useEffect(() => {
-        if(isLogged) {
-            const storedExpiry = localStorage.getItem(EXPIRACION_KEY);
-            const timeExpiracion = Number(storedExpiry) - Date.now();
+            const { ...dataToStore } = newState; 
+            localStorage.setItem(storageKey, JSON.stringify(dataToStore));
+            
+            return newState;
+        });
+    };
 
-            if(timeExpiracion > 0) {
-                const timer = setTimeout(() => {
-                    alert('Tu sesión ha expirado. Por favor, vuelve a iniciar sesión');
-                    logout();
-                }, timeExpiracion);
-
-                return () => clearTimeout(timer);
-            } else {
-                logout();
-            }
-        }
-    }, [isLogged]);
-
-    const contextValue: AuthContextType = {isLogged, token, userName, puntos, profesorId, login, logout};
+    const contextValue: AuthContextType = {
+        ...authState,
+        login,
+        logout,
+        setUserData,
+    };
 
     return (
-        <AuthContext.Provider value={ contextValue }>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};

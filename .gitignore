@@ -56,7 +56,6 @@
 
 .env
 PRUEBAS_POSTMAN.md
-.start.bat
 Los
 Acceso
 certs/
@@ -64,3 +63,4 @@ node_modules
 composer.json
 composer.lock
 vendor
+contraseñas.php

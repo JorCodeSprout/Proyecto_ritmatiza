@@ -71,7 +71,8 @@ class AuthController extends Controller {
     }
 
     public function me() {
-        return response()->json(Auth::user());
+        $user = Auth::user();
+        return response()->json($user->only(['id', 'name', 'email', 'role', 'puntos', 'profesor_id']));
     }
 
     public function refresh() {
@@ -82,12 +83,13 @@ class AuthController extends Controller {
 
     protected function respondWithToken($token, $user) {
         $ttl = Config::get('jwt.ttl', 60);
+        $userData = $user->only(['id', 'name', 'email', 'role', 'puntos', 'profesor_id']);
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => $ttl * 60,
-            'user' => $user
+            'user' => $userData
         ]);
     }
 }

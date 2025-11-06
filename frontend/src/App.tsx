@@ -5,6 +5,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import AcercaDePage from "./pages/AcercaDePage";
 import ContactoPage from "./pages/ContactoPage";
+import TareasPage from "./pages/TareasPage";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage/>} />
           <Route path="/acerca" element={<AcercaDePage/>} />
           <Route path="/contacto" element={<ContactoPage/>} />
+          <Route path="/tareas" element={<TareasPage/>} />
         </Routes>
       </Router>
     </AuthProvider>
