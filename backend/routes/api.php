@@ -38,7 +38,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(MusicaController::class)->prefix('musica')->group(function () {
         // Corregido: 'getPlaylsit' -> 'getPlaylist'
-        Route::get('playlist', 'getPlaylist'); 
+        Route::get('playlist', 'getPlaylist');
         // Rutas para Alumnos/Profesores/Admin
         Route::post('sugerir', 'sugerirCancion');
         Route::get('buscar-spotify', 'buscarSpotify');
@@ -47,10 +47,10 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('can:profesor-or-admin')->group(function () {
         Route::controller(TareaController::class)->prefix('/tareas')->group(function () {
             // Crear tarea
-            Route::post('/', 'store');
+            Route::post('crear', 'store');
             // Ver entregas
             Route::get('{tarea}/entregas', 'entregasPorTarea');
-            
+
             // Calificar tarea
             Route::post('entregas/{entrega}/calificar', 'calificarEntrega');
         });

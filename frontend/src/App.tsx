@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import AcercaDePage from "./pages/AcercaDePage";
 import ContactoPage from "./pages/ContactoPage";
 import TareasPage from "./pages/TareasPage";
+import CrearTareasPage from "./pages/CrearTareasPage.tsx";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/acerca" element={<AcercaDePage/>} />
           <Route path="/contacto" element={<ContactoPage/>} />
           <Route path="/tareas" element={<TareasPage/>} />
+          <Route path="/tareas/crear" element={<CrearTareasPage/>} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -6,6 +6,7 @@ const API_URL = 'https://ritmatiza.local/api';
 
 // Interfaz User replicada para tipar el objeto que se pasa al AuthProvider
 interface User {
+    id: number;
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
@@ -79,7 +80,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
 
             {error && <p style={{color: 'red', fontWeight: 'bold'}}>{error}</p>}
 
-            {/* Input nombre */}
             <div className="input-container">
                 <input 
                     type="text" 
@@ -89,12 +89,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
                     required 
-                    disabled={loading}  
+                    disabled={loading}
                 />
                 <label htmlFor="nombre">Nombre completo</label>
             </div>
 
-            {/* Input correo */}
             <div className="input-container">
                 <input 
                     type="email" 
@@ -109,7 +108,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                 <label htmlFor="correo">Correo corporativo</label>
             </div>
 
-            {/* Input password */}
             <div className="input-container">
                 <input 
                     type="password" 
@@ -119,12 +117,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
-                    disabled={loading}  
+                    disabled={loading}
                 />
                 <label htmlFor="clave">Contraseña</label>
             </div>
 
-            {/* Input confirmación password */}
             <div className="input-container">
                 <input 
                     type="password" 
@@ -134,12 +131,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     value={passwordConfirmation} 
                     onChange={(e) => setPasswordConfirmation(e.target.value)} 
                     required 
-                    disabled={loading}  
+                    disabled={loading}
                 />
                 <label htmlFor="confirmacion">Confirmar contraseña</label>
             </div>
 
-            {/* Términos y Condiciones */}
             <div className="term-container">
                 <input type="checkbox" 
                 name="terms" 
@@ -154,8 +150,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
             </label>
             </div>
 
-            {/* Botón Registrarse */}
-            <button 
+            <button
                 type="submit"
                 className='registro'
                 disabled={loading}
@@ -165,7 +160,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
 
             <p>¿Ya tienes una cuenta?</p>
 
-            {/* Botón Iniciar Sesión (Volver) */}
             <button
                 type="button"
                 className='iniciar'

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from '../hooks/useAuth';
 import "../assets/styles/Tareas.css";
+import {useNavigate} from "react-router-dom";
 
 type EstadoEntrega = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 
@@ -73,11 +74,21 @@ const fetchMisEntregas = async (token: string): Promise<Entrega[]> => {
 };
 
 const Tareas: React.FC = () => {
-    const { isLogged, role, puntos, profesorId, token } = useAuth(); 
+    const { isLogged, role, puntos, profesorId, token } = useAuth();
+    const navigate = useNavigate();
 
     const [tareasDisponibles, setTareasDisponibles] = useState<Tarea[]>([]); 
     const [misEntregas, setMisEntregas] = useState<Entrega[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const handleCrearTarea = async () => {
+        if(role !== "PROFESOR" && role !== "ADMIN") {
+            alert("No tienes permisos para crear tareas");
+            return;
+        }
+
+        navigate('/tareas/crear');
+    }
 
     const loadTareasData = useCallback(async () => {
         setLoading(true);
@@ -196,7 +207,7 @@ const Tareas: React.FC = () => {
                             <p>
                                 Aquí se ubicaría el formulario para crear una nueva tarea.
                             </p>
-                            <button className="btn-crear">
+                            <button className="btn-crear" onClick={handleCrearTarea}>
                                 Crear Nueva Tarea
                             </button>
                         </div>
@@ -259,7 +270,7 @@ const ListaUltimasTareas: React.FC<{ tareas: Tarea[] }> = ({ tareas }) => (
             tareas.slice(0, 5).map(tarea => (
                 <li key={tarea.id} className="ultima-tarea-item">
                     <h4>
-                        <span>{tarea.titulo}</span>
+                        <span>{tarea.titulo} </span>
                         <span className="recompensa">
                             <strong>{tarea.recompensa}</strong> 🎵
                         </span>

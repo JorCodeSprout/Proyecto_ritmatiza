@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../assets/styles/formulario_inicio.css'
 
 interface User {
+    id: number;
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';

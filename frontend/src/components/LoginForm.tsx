@@ -5,11 +5,12 @@ import { Link, useNavigate } from 'react-router-dom';
 const API_URL = 'https://ritmatiza.local/api';
 
 interface User {
+    id: number;
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
     puntos: number; 
-    profesor_id: number | null; // Este campo se pasa a onLoginSuccess
+    profesor_id: number | null;
 }
 
 interface LoginFormProps {
