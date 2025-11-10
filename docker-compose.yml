@@ -6,7 +6,6 @@ services:
       dockerfile: docker/php/Dockerfile
     container_name: ritmatiza_app
     restart: always
-    # CORRECCIÓN: Uso de sintaxis de matriz para el shell + Forzar permisos + Ejecución
     command: [ "sh", "-c", "chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache && chmod +x /var/www/html/public/index.php /var/www/html/artisan && exec docker-php-entrypoint php-fpm" ]
     expose:
       - "9000"

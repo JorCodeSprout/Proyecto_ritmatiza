@@ -57,7 +57,7 @@ const getTaskStatusText = (estado?: Tarea['estado_entrega']) : string => {
 const API_URL = 'https://ritmatiza.local/api';
 const SPOTIFY_TOKEN_ENDPOINT = `${API_URL}/spotify_token`;
 
-const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap'];
+const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap', 'Queen', 'Nirvana'];
 // Tiempo de renovación (59 min y 30 segundos)
 const TOKEN_REFRESH_INTERNAL = (59 * 60 + 30) * 1000; 
 
