@@ -73,6 +73,6 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('musica/playlist/eliminar', [MusicaController::class, 'eliminarCancionPlaylist']);
 
         // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
-        Route::post('musica/sugerencias/cancelar', [MusicaController::class, 'cancelarSugerencia']);
+        Route::post('musica/sugerencias/cancelar', [MusicaController::class, 'cancelarCancion']);
     });
 });

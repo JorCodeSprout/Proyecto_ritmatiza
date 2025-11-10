@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * SpotifyAuthController
+ * ==============================
+ * Este controlador será el encargado de gestionar el flujo de autenticación del administrador con la API de Spotify.
+ * El objetivo principal es obtener y almacenar de forma segura los AccessToken y RefreshToken necesarios para que
+ * el backend pueda interactuar con la API en nombre del administrador.
+ * Es necesario para gestionar la playlist, tanto para añadir como para eliminar canciones y solo los usuarios Admin
+ * tendrán acceso a estos endpoints
+ */
 namespace App\Http\Controllers;
 
 
@@ -22,42 +31,48 @@ class SpotifyAuthController extends Controller
         $this->spotifyService = $spotifyService;
     }
 
-    /**
-     * Paso 1: Redirige al ADMIN a la página de autorización de Spotify.
-     * Genera y almacena el parámetro 'state' para prevención de CSRF.
+    /*
+     * redirect
+     * ==============
+     * Se encarga de verificar el usuario para confirmar que sea Admin. Genera un parámetro state aleatorio para prevenir
+     * los ataques CSRF y lo almacena en caché. Define los permisos necesarios como playlist-modify-public y construye
+     * y devuelve la URL de autorización de Spotify a la que el frontend debe redirigir al usuario.
+     *
+     * Devuelve un objeto JSON con la URL de autenticación.
      */
     public function redirect(Request $request)
     {
-        // El usuario debe estar autenticado vía JWT
         $user = auth()->user();
         if (Gate::denies('admin-only', $user)) {
             return response()->json(['error' => 'Acceso no autorizado. Se requiere rol de Admin.'], 403);
         }
 
-        // Generar un estado aleatorio para prevenir CSRF
         $state = Str::random(40);
 
         // Almacenar el estado en la sesión para validación posterior
-        // Usamos la ID del usuario para diferenciar la sesión si fuera necesario, aunque la sesión
-        // de Laravel ya es única.
-        // $request->session()->put('spotify_auth_state', $state);
         $cacheState = self::CACHE_STATE_PREFIX . $user->id;
-        // Se guarda en la cache por 5min
+        // Se guarda en la caché por 5min
         Cache::put($cacheState, $state, 300);
 
-        // Definimos los permisos necesarios (scope)
-        $scope = 'playlist-modify-public user-read-private'; 
+        // Definimos los permisos necesarios
+        $scope = 'playlist-modify-public user-read-private';
 
         $authUrl = $this->spotifyService->getAuthUrl($scope, $state);
 
-        // Devolvemos la URL para que el frontend redirija al usuario.
         return response()->json([
             'auth_url' => $authUrl
         ]);
     }
 
-    /**
-     * Paso 2: Recibe el código de Spotify, valida el 'state' e intercambia por Access Token.
+    /*
+     * callback
+     * ==============
+     * Este método se encargará de que Spotify verifique el rol de Admin y compruebe la validez del parámetro state. Una
+     * vez hecho esto recibe el código de autorización de Spotify y lo intercambia con los token de acceso y refresh usando
+     * el SpotifyApiService. Los almacena de forma segura y persistente en la caché para poder utilizarlos posteriormente.
+     *
+     * Devuelve un mensaje de error detallado si falla o un mensaje de éxito para confirmar que se hayan almacenado
+     * correctamente.
      */
     public function callback(Request $request)
     {
@@ -66,7 +81,6 @@ class SpotifyAuthController extends Controller
             return response()->json(['error' => 'Acceso no autorizado.'], 403);
         }
 
-        // 1. **VALIDACIÓN DE SEGURIDAD (CSRF):** Comparar el 'state' de la petición con el almacenado en sesión.
         $sessionState = $request->session()->pull('spotify_auth_state');
         $requestState = $request->input('state');
 
@@ -87,10 +101,9 @@ class SpotifyAuthController extends Controller
         }
 
         try {
-            // 2. Intercambia el código por tokens
+            // Intercambia el código por tokens
             $tokens = $this->spotifyService->getAccessToken($code);
-            
-            // 3. **ALMACENAMIENTO SEGURO Y PERSISTENTE:** Guardar los tokens en la caché
+
             // La clave de caché es única para el administrador (auth()->id())
             $cacheKey = self::CACHE_KEY_PREFIX . $user->id;
 
@@ -100,7 +113,6 @@ class SpotifyAuthController extends Controller
                 'expires_at' => now()->addSeconds($tokens['expires_in']),
             ], $tokens['expires_in']); // Almacenar por el tiempo de vida del token
 
-            // Opcionalmente, podemos obtener el ID del usuario de Spotify para confirmación
             $spotifyUser = $this->spotifyService->obtenerUsuario($tokens['access_token']);
 
             Log::info("Spotify tokens guardados en caché para el Admin.", ['admin_id' => $user->id, 'spotify_user_id' => $spotifyUser['id'] ?? 'N/A']);

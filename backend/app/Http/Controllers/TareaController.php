@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * TareaController
+ * ===================
+ * Este controlador se encargará de gestionar todo lo relacionado con las tareas. La gran mayoría de métodos de esta clase
+ * dependen de que seas mínimo profesor para poder utilizarlos.
+ * Contiene métodos para mostrar las tareas, para crearlas, para corregir, para subir una entrega, para calificar la tarea,
+ * para ver las 3 últimas tareas generales, para ver las 3 últimas tareas que ha subido un profesor específico, uno para
+ * ver las entregas que se han enviado para una tarea y por último uno que muestra las tareas de un estudiante
+ */
 namespace App\Http\Controllers;
 
 use App\Models\Entrega;
@@ -104,8 +113,8 @@ class TareaController extends Controller {
             ->latest()
             ->limit(3)
             ->get();
-            
-        return response()->json($tareas); 
+
+        return response()->json($tareas);
     }
 
     public function entregasPorTarea(Tarea $tarea) {
@@ -132,25 +141,25 @@ class TareaController extends Controller {
         $estudianteId = Auth::id();
 
         try {
-            $tareas = Tarea::where('creador_id', $profesorId) 
+            $tareas = Tarea::where('creador_id', $profesorId)
                 ->latest()
                 ->limit(3)
                 ->when($estudianteId, function ($query) use ($estudianteId) {
                     $query->with(['entregas' => function ($q) use ($estudianteId) {
                         $q->where('estudiante_id', $estudianteId)
-                            ->latest() 
+                            ->latest()
                             ->limit(1);
                     }]);
                 })
                 ->get();
 
             $tareasConEstado = $tareas->map(function ($tarea) {
-                $entrega = $tarea->entregas->first(); 
+                $entrega = $tarea->entregas->first();
 
                 $tareaArray = $tarea->toArray();
-                
-                $tareaArray['estado_entrega'] = $entrega ? $entrega->estado : 'PENDIENTE'; 
-                $tareaArray['entrega_id'] = $entrega ? $entrega->id : null; 
+
+                $tareaArray['estado_entrega'] = $entrega ? $entrega->estado : 'PENDIENTE';
+                $tareaArray['entrega_id'] = $entrega ? $entrega->id : null;
                 unset($tareaArray['entregas']);
 
                 return $tareaArray;
