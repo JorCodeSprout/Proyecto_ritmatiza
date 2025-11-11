@@ -1,5 +1,19 @@
 <?php
 
+/*
+ * Entrega
+ * =================
+ * Entidad que gestiona las entregas de tareas.
+ *
+ * Datos de la tabla
+ * ----------------------------
+ * ruta --> Ruta del archivo entregado
+ * estado --> puede ser 'PENDIENTE', 'APROBADA', 'SUSPENDIDA'
+ * estudiante_id --> FK de User que realiza dicha entrega
+ * tarea_id --> FK de Tarea a la que se realiza la entrega
+ * calificador_id --> FK de User (PROFESOR o ADMIN) que corrige la entrega
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

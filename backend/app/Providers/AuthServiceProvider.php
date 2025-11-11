@@ -1,10 +1,17 @@
 <?php
 
+/*
+ * AuthServiceProvider
+ * ==========================
+ * En esta clase se gestionarán los permisos existentes para que sea más sencillo gestionar los accesos dependiendo del
+ * role que tenga un usuario.
+ */
+
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use App\Models\User; 
+use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -14,7 +21,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 
+        //
     ];
 
     /**

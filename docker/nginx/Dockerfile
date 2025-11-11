@@ -1,10 +1,10 @@
 # Usamos nginx:stable-alpine como base, ya que es pequeña y rápida.
 FROM nginx:stable-alpine
 
-# 1. Instalar herramientas necesarias (ej. para gestión de usuarios)
+# 1. Instalar herramientas necesarias
 RUN apk update && apk add --no-cache shadow
 
-# 2. CREAR el usuario y grupo 'www-data' (GID 82 es estándar en Debian/Ubuntu)
+# 2. CREAR el usuario y grupo 'www-data'
 # Esto asegura que Nginx y PHP-FPM reconozcan el mismo ID de usuario/grupo.
 RUN groupadd -g 82 www-data || true && \
     usermod -a -G www-data nginx

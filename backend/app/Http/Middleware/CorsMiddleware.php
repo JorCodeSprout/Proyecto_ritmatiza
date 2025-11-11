@@ -18,18 +18,17 @@ class CorsMiddleware
         // Define los orígenes permitidos
         $allowedOrigins = [
             // Orígenes del Frontend (React/Vite)
-            'http://localhost:5173',      
+            'http://localhost:5173',
             'http://127.0.0.1:5173',
             'https://localhost:5173',
-            
-            // Orígenes específicos de ritmatiza.local (si usa un puerto específico)
+
+            // Orígenes específicos de ritmatiza.local
             'http://ritmatiza.local',
             'https://ritmatiza.local',
             'http://ritmatiza.local:3000',
             'https://ritmatiza.local:3000',
 
-            // Orígenes de desarrollo si usas puertos estándar
-            'http://localhost:3000',      
+            'http://localhost:3000',
             'https://localhost:3000',
         ];
 
@@ -45,7 +44,7 @@ class CorsMiddleware
         // Ejecuta la petición al controlador
         $response = $next($request);
 
-        // Si $allowedOrigin es nulo (no está permitido), usa el primero de la lista 
+        // Si $allowedOrigin es nulo (no está permitido), usa el primero de la lista
         // o considera el * (cuidado con esto en producción, pero es útil para debugging)
         $finalAllowedOrigin = $allowedOrigin ?? $allowedOrigins[0];
 

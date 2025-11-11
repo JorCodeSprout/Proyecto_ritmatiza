@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * Este código se encarga de mapear toda la aplicación a excepción de un par de rutas de las que se encargará el archivo
+ * <<web.php>>. Esta es la manera que tendrá la parte frontend de la aplicación para comunicarse con el backend utilizando
+ * las promesas de JS.
+ */
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MusicaController;
@@ -62,7 +68,6 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('can:admin-only')->group(function () {
         Route::controller(SpotifyAuthController::class)->prefix('spotify')->group(function () {
             Route::post('redirect', 'redirect');
-            Route::get('callback', 'callback');
         });
 
         // Administracion de Playlist:

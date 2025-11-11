@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * SpotifyApiService
+ * ===========================
+ * Este servicio se encargará de gestionar la unión de mi aplicación con la API de Spotify. Su objetivo es centralizar
+ * la lógica de autenticación y la ejecución de consultas. Se utiliza la librería Guzzle para peticiones HTTP.
+ */
+
 namespace App\Services;
 
 use GuzzleHttp\Client;
@@ -14,16 +21,27 @@ class SpotifyApiService {
     protected string $redirectUri;
     protected string $baseUrl = 'https://api.spotify.com/v1/';
 
+    // Clave para almacenar el token de credenciales del cliente en el caché
     private const CLIENT_CREDENTIALS_CACHE_KEY = 'spotify_client_token';
 
     public function __construct() {
         $this->clientId = config('services.spotify.client_id');
         $this->clientSecret = config('services.spotify.client_secret');
-        $this->redirectUri = config('services.spotify.redirect_uri'); 
+        $this->redirectUri = config('services.spotify.redirect_uri');
 
         $this->cliente = new Client();
     }
 
+    /*
+     * getAuthUrl
+     * ==================
+     * Este método construye la URL de redirección para iniciar el flujo de autenticación del administrador.
+     * Datos recibidos:
+     *  1. scope --> permisos solicitados a Spotify
+     *  2. state --> código aleatorio para prevención de CSRF
+     *
+     * Devuelve la ruta completa de autenticación de Spotify
+     */
     public function getAuthUrl(string $scope, string $state): string {
         $params = [
             'client_id' => $this->clientId,
@@ -38,6 +56,16 @@ class SpotifyApiService {
         return 'https://accounts.spotify.com/authorize?' . http_build_query($params);
     }
 
+    /*
+     * getAccessToken
+     * =====================
+     * Este método se encarga de intercambiar el código de autorización temporal recibido en el callback por el Access
+     * Token y el Refresh Token del admin. Recibe un código el cual es el recibido del callback de Spotify.
+     * En el caso de que todo vaya correctamente devuelve un array con el Access Token y el Refresh Token con un tiempo
+     * de expiración.
+     *
+     * En el caso de que ocurra algún error lanzará una excepción ClientException.
+     */
     public function getAccessToken(string $code) {
         try {
             $response = $this->cliente->post('https://accounts.spotify.com/api/token', [
@@ -49,7 +77,7 @@ class SpotifyApiService {
                     // 'client_secret' => $this->clientSecret,
                 ],
                 'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret), 
+                    'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret),
                 ]
             ]);
 
@@ -60,8 +88,15 @@ class SpotifyApiService {
         }
     }
 
+    /*
+     * RefreshAccessToken
+     * ============================
+     * Este método será el encargado de que el Access Token se mantenga activo actualizándose constantemente de forma automática
+     * Devuelve un array que contiene el nuevo access_token y el tiempo de expiración. Si la actualización falla se lanzará
+     * una excepción ClientException.
+     */
     public function refreshAccessToken(string $refreshToken): array {
-        try {   
+        try {
             $response = $this->cliente->post('https://accounts.spotify.com/api/token', [
                 'form_params' => [
                     'grant_type' => 'refresh_token',
@@ -79,7 +114,16 @@ class SpotifyApiService {
         }
     }
 
-    public function obtenerUsuario(string $accessToken): array 
+    /*
+     * ObtenerUsuario
+     * ========================
+     * Este método consigue la información del perfil del usuario administrador autenticado y utiliza esa información para
+     * verificar la conexión y obtener el ID de Spotify del administrador.
+     *
+     * Devuelve un array con los datos de dicho usuario y en el caso de que la petición a la API falle, lanza una excepción
+     * ClientException
+     */
+    public function obtenerUsuario(string $accessToken): array
     {
         try {
             $response = $this->cliente->get($this->baseUrl . 'me', [
@@ -94,10 +138,12 @@ class SpotifyApiService {
         }
     }
 
-    /**
-     * Summary of buscarCanciones
-     * @param string $query --> Cadena de búsqueda
-     * @param string $accessToken --> Token de acceso
+    /*
+     * BuscarCanciones
+     * ====================
+     * Este método es el necesario para realizar la búsqueda de canciones en la aplicación. Utilizará las credenciales del
+     * admin en la API de Spotify y mostrará la cantidad de un máximo de 10 canciones que se adapten a los resultados
+     * de búsqueda.
      */
     public function buscarCanciones(string $query, string $accessToken): array {
         try {
@@ -107,7 +153,7 @@ class SpotifyApiService {
                 ],
                 'query' => [
                     'q' => $query,
-                    'type' => 'track', 
+                    'type' => 'track',
                     'limit' => 10,
                 ],
             ]);
@@ -119,10 +165,13 @@ class SpotifyApiService {
         }
     }
 
-    /**
-     * @param string $trackUri --> URI de la canción
-     * @param string $playlistId --> ID de la playlist destino
-     * @param string $accessToken --> Token de acceso del Admin
+    /*
+     * AnadirCancion
+     * ======================
+     * En el caso de este método, se utilizará para gestionar las adiciones de las canciones a la playlist del administrador.
+     * Require de un Access Token que debe tener el scope 'playlist-modify-public' para que la API funcione de forma correcta.
+     *
+     * Devuelve un booleano dependiendo de si se ha podido añadir o no.
      */
     public function anadirCancion(string $trackUri, string $playlistId, string $accessToken) {
         try {
@@ -143,6 +192,15 @@ class SpotifyApiService {
         }
     }
 
+    /*
+     * GetClientCredentialsToken
+     * =================================
+     * Este método es quizás el más importante, ya que es el encargado de actualizar las credenciales del admin para que
+     * la sesión con la API no expire y no sea necesario ir ingresando siempre un nuevo token de acceso de manera manual.
+     * El token se almacenará en la caché para evitar peticiones repetidas a Spotify.
+     *
+     * Devuelve una cadena con el access token o null en caso de error.
+     */
     public function getClientCredentialsToken() {
         // Intentamos obtener el token de la caché
         if(Cache::has(self::CLIENT_CREDENTIALS_CACHE_KEY)) {
@@ -162,7 +220,7 @@ class SpotifyApiService {
                 ],
             ]);
 
-            
+
             $data = json_decode((string) $response->getBody(), true);
 
             if($response->getStatusCode() === 200 && isset($data['access_token'])) {

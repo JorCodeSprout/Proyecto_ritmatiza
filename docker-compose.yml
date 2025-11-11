@@ -13,13 +13,6 @@ services:
       - ./backend:/var/www/html
     working_dir: /var/www/html/
 
-    # healthcheck:
-    #   test: ["CMD-SHELL", "ps aux | grep -v grep | grep php-fpm || exit 1"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-    #   start_period: 20s
-
   # Servidor Web / Proxy Nginx
   web:
     build:

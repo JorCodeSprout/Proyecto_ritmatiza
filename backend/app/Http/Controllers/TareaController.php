@@ -25,17 +25,27 @@ class TareaController extends Controller {
         $this->middleware('auth:api', ['except' => ['ultimasTareas']]);
     }
 
-    // METODOS PARA PROFESOR/ADMIN
-
-    /**
-     * Muestra todas las tareas
+    /*
+     * Index
+     * ==============
+     * Devuelve todas las tareas que contengan un creador, es decir, a no ser que se haya modificado la BBDD debería mostrar
+     * todas las tareas.
      */
     public function index() {
         return response()->json(Tarea::with('creador')->get());
     }
 
-    /**
-     * Crear tarea (NECESARIO SER PROFESOR O ADMIN)
+    /*
+     * Store
+     * ================
+     * Este método será el encargado de crear tareas. Si no eres profesor o admin se te mostrará un mensaje de error
+     * de permisos. Después, los datos recibidos, deberán pasar una validación la cual es la siguiente:
+     *  1. Título --> Título de la tarea.
+     *  2. Descripción --> Breve descripción de en qué consiste.
+     *  3. Recompensa --> Cantidad de puntos que obtendrás una vez entregues dicha tarea si es correcta.
+     *  4. Reenviar --> Se da la opción en ciertas tareas, de poder enviar una entrega en más de una ocasión.
+     *
+     * Una vez que pasa la validación se crea la tarea y posteriormente se muestra un mensaje de verificación al usuario.
      */
     public function store(Request $request) {
         if(Gate::denies('profesor-or-admin')) {
@@ -63,6 +73,14 @@ class TareaController extends Controller {
         return response()->json(['message' => 'Tarea creada exitosamente.', 'tarea' => $tarea], 200);
     }
 
+    /*
+     * SubirEntrega
+     * ======================
+     * Este método será el encargado de guardar el archivo en la base de datos. Por defecto, cuando entregas la tarea ésta
+     * pasa a tener un estado PENDIENTE y éste se mantendrá hasta que algún profesor o admin la corrija.
+     * La ruta debe ser una cadena de no más de 500 caracteres. Si pasa la validación y la entrega se crea de forma correcta,
+     * se mostrará un mensaje de confirmación. En el caso de que la validación falle, se mostrará un mensaje 422.
+     */
     public function subirEntrega(Request $request, Tarea $tarea) {
         $validador = Validator::make($request->all(), [
             'ruta' => 'required|string|max:500',
@@ -82,6 +100,15 @@ class TareaController extends Controller {
         return response()->json(['message' => 'Entrega subida. Pendiente de calificación', 'entrega' => $entrega], 200);
     }
 
+    /*
+     * CalificarEntrega
+     * ============================
+     * Para este método es obligatorio se admin o profesor, si no lo eres se te mostrará un mensaje de error de permisos.
+     * Una vez consigas entrar se te mostrará un botón para aprobar la entrega o para rechazarla. En cualquiera de los dos
+     * casos, actualizará el estado de la tarea al valor que se ha indicado. En el caso de aprobarla, se le asignarán los
+     * puntos al usuario que realizó dicha entrega.
+     * Finalmente, en el caso de que todo haya funcionado correctamente, se le mostrará un mensaje de éxito al usuario.
+     */
     public function calificarEntrega(Request $request, Entrega $entrega) {
         if(Gate::denies('profesor-or-admin')) {
             return response()->json(['error', 'No tienes permiso para calificar esta tarea'], 403);
@@ -108,6 +135,14 @@ class TareaController extends Controller {
         return response()->json(['message' => 'Entrega calificada y puntos entregados', 'entrega' => $entrega], 200);
     }
 
+    /*
+     * UltimasTareas
+     * =======================
+     * Este será el método que se utilizará como general para que cualquier usuario, al iniciar en nuestra aplicación
+     * pueda ver las últimas 3 tareas que se han creado sin necesidad de loguearse o registrarse.
+     *
+     * Devuelve un objeto JSON con dichas tareas.
+     */
     public function ultimasTareas() {
         $tareas = Tarea::with('creador')
             ->latest()
@@ -117,6 +152,13 @@ class TareaController extends Controller {
         return response()->json($tareas);
     }
 
+    /*
+     * EntregasPorTarea
+     * ============================
+     * En este caso es obligatorio ser admin o profesor y en caso de no serlo se te mostrará un mensaje de error de
+     * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes. La devolución
+     * de este método consiste en un objeto JSON con todas las entregas.
+     */
     public function entregasPorTarea(Tarea $tarea) {
         if(Gate::denies('profesor-or-admin')) {
             return response()->json(['error' => 'No tienes permiso para ver todas las entregas'], 403);
@@ -126,18 +168,24 @@ class TareaController extends Controller {
         return response()->json($entregas);
     }
 
+    /*
+     * misEntregas
+     * ==========================
+     * Este método consiste en mostrar todas las entregas que ha realizado un usuario estudiante.
+     */
     public function misEntregas() {
         $entregas = Auth::user()->entregas()->with('tarea')->get();
         return response()->json($entregas);
     }
 
-    /**
-     * Obtiene las últimas 3 tareas creadas por un profesor específico.
-     * @param int $profesorId El ID del profesor.
-     * @return \Illuminate\Http\JsonResponse
+    /*
+     * GetTareasByProfesor
+     * ===========================
+     * Este método, como su propio nombre indica, sirve para buscar las tareas creadas por un profesor específico. Al igual que
+     * ultimasTareas, se mostrarán las 3 últimas tareas creadas. En el caso de que haya cualquier error, se lanzará una
+     * excepción mostrando el mensaje del motivo por el que no se han podido recuperar dichas tareas.
      */
-    public function getTareasByProfesor(int $profesorId)
-    {
+    public function getTareasByProfesor(int $profesorId) {
         $estudianteId = Auth::id();
 
         try {

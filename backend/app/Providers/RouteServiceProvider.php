@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * RouteServiceProvider
+ * ============================
+ * En esta clase se encargará de gestionar las rutas de la aplicación. También se encargará de definir la regla de límite
+ * de peticiones para la API (60 por minuto)
+ */
+
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;

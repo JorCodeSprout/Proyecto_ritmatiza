@@ -16,11 +16,6 @@ echo.
 :: permitiendo que ambos procesos (Docker y Vite) se ejecuten en paralelo.
 START /B cmd /c "cd frontend && npm run dev"
 
-echo.
-echo Ambos procesos iniciados.
-echo.
 echo -> Acceso: http://ritmatiza.local
-echo -> Los logs de Vite se muestran en la ventana que acaba de abrir.
-echo.
 
 endlocal

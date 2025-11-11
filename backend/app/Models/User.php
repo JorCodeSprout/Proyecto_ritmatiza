@@ -1,10 +1,22 @@
 <?php
 
+/*
+ * User
+ * ============
+ * Entidad que gestiona los usuarios de la base de datos
+ *
+ * Datos de la tabla
+ * ------------------------
+ * name --> nombre del usuario
+ * email --> correo electrónico del usuario
+ * password --> contraseña
+ * role --> puede ser 'ADMIN', 'PROFESOR', 'ESTUDIANTE'
+ * puntos --> cantidad de puntos que podrá utilizar para "comprar" canciones
+ * profesor_id --> FK User (PROFESOR) del usuario
+ */
+
 namespace App\Models;
 
-use App\Models\Tarea;
-use App\Models\Entrega;
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
