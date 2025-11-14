@@ -26,7 +26,7 @@ interface Entrega {
     };
 }
 
-const API_URL = "https://ritmatiza.local/api"; 
+const API_URL = import.meta.env.VITE_API_URL; 
 
 const fetchTareas = async (profesorId: number | null, token: string | null): Promise<Tarea[]> => {
     let url: string;

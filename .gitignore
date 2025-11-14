@@ -64,3 +64,4 @@ composer.json
 composer.lock
 vendor
 contraseñas.php
+backup-railway.sql

@@ -1,10 +1,7 @@
 import {useAuth} from "../hooks/useAuth.ts";
 import {useState} from "react";
 
-// ⚠️ NOTA: Asegúrate de que esta URL base sea correcta.
-// Si la ruta final para la creación es /api/tareas/crear,
-// esta constante debe ser solo la base.
-const API_URL = "https://ritmatiza.local/api/";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface NuevaTarea {
     titulo: string;

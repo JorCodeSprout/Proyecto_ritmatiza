@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import '../assets/styles/home.css';
+import Tareas from '../components/Tareas';
 
 interface Tarea {
     id: number;
@@ -38,23 +39,7 @@ const mainContentStyles: React.CSSProperties = {
     minHeight: '90%'
 }
 
-const getTaskStatusColor = (estado?: Tarea['estado_entrega']) : string => {
-    switch (estado) {
-        case 'APROBADA': return 'green';
-        case 'RECHAZADA': return 'red';
-        default: return 'blue';
-    }
-}
-
-const getTaskStatusText = (estado?: Tarea['estado_entrega']) : string => {
-    switch (estado) {
-        case 'APROBADA': return '✅ Aprobada';
-        case 'RECHAZADA': return '❌ Rechazada';
-        default: return '⌛ Pendiente';
-    }
-}
-
-const API_URL = 'https://ritmatiza.local/api';
+const API_URL = import.meta.env.VITE_API_URL;
 const SPOTIFY_TOKEN_ENDPOINT = `${API_URL}/spotify_token`;
 
 const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap', 'Queen', 'Nirvana'];
@@ -62,7 +47,7 @@ const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap', 'Quee
 const TOKEN_REFRESH_INTERNAL = (59 * 60 + 30) * 1000; 
 
 const Home: React.FC = () => {
-    const { isLogged, userName, puntos, profesorId, token } = useAuth(); 
+    const { isLogged, userName, role, profesorId, token } = useAuth(); 
 
     const [ultimasTareas, setUltimasTareas] = useState<Tarea[]>([]);
     const [isLoadingTareas, setIsLoadingTareas] = useState(true);
@@ -314,59 +299,97 @@ const Home: React.FC = () => {
         );
     }
     
+    // return (
+    //     <Layout>
+    //         <div style={mainContentStyles} className='logged-in-layout'>
+    //             <div className='grid-container-login'>
+    //                 <div className='grid-item bloque-header-izq'>
+    //                 <h1>{bienvenido}</h1>
+    //                 <p>Explora tu música y tus actividades.</p>
+    //                 </div>
+
+    //                 <div className='grid-item bloque-puntos'>
+    //                 <h2>Puntos</h2>
+    //                 <h4 className="puntosConseguidos">
+    //                     {puntos !== null ? `${puntos} Puntos` : 'Cargando...'}
+    //                 </h4>
+    //                 </div>
+
+    //                 <div className="grid-item bloque-actividad-header">
+    //                     <h2>Tareas de tu profesor</h2>
+    //                 </div>
+                    
+    //                 {/* Sección de Tareas para usuario Logueado */}
+    //                 <div className='grid-item bloque-tareas-logueado'>
+    //                     {isLoadingTareas && <p>Cargando tareas...</p>}
+    //                     {errorTareas && <p style={{color: 'red'}}>{errorTareas}</p>}
+                        
+    //                     {!isLoadingTareas && !errorTareas && ultimasTareas.length === 0 && (
+    //                         <p>Tu profesor no ha asignado tareas recientes.</p>
+    //                     )}
+                        
+    //                     {!isLoadingTareas && !errorTareas && ultimasTareas.map((tarea, index) => (
+    //                         <div key={tarea.id} className={`grid-item bloque-tarea-item-${index + 1} task-card card-base`}>
+    //                             <div className='task-content'>
+    //                                 <div className='task-info-v2'>
+    //                                     <h3 className='task-title-v2'>{tarea.titulo}</h3>
+    //                                     <p className='task-description-v2'>{tarea.descripcion}</p>
+    //                                 </div>
+                                    
+    //                                 <div className='task-footer-v2'>
+    //                                     <p className='task-reward-v2'>
+    //                                         🏅 Puntos: {tarea.recompensa}
+    //                                     </p>
+    //                                     <p className="task-status-v2" style={{ color: getTaskStatusColor(tarea.estado_entrega)}}>
+    //                                         Estado: {getTaskStatusText(tarea.estado_entrega)}
+    //                                     </p>
+    //                                 </div>
+    //                             </div>
+                                
+    //                             <Link to={`/tarea/${tarea.id}`} className="task-link-v2">
+    //                                 Ver Tarea
+    //                             </Link>
+    //                         </div>
+    //                     ))}
+    //                                         </div>
+
+    //                 {renderSongCards()}
+    //             </div>
+    //         </div>
+    //     </Layout>
+    // );
+
+    const profesor_admin = role === 'PROFESOR' || role === 'ADMIN';
+
+    if (profesor_admin) {
+        return (
+            <Layout>
+                <div className='mainContentStyles logged-in-layout'>
+                    <div className='grid-container-profesor'>
+                        <div className='grid-item bloque-header-profesor'>
+                            <h1>{bienvenido}</h1>
+                            <p>Gestión y administración de la plataforma.</p>
+                            <Tareas />
+                        </div>
+
+                        <h1>Canciones</h1>
+                        {renderSongCards()}
+                        
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
     return (
         <Layout>
-            <div style={mainContentStyles} className='logged-in-layout'>
-                <div className='grid-container-login'>
+            <div className='mainContentStyles logged-in-layout'>
+                <div className='grid-container-estudiante'>
                     <div className='grid-item bloque-header-izq'>
                     <h1>{bienvenido}</h1>
-                    <p>Explora tu música y tus actividades.</p>
                     </div>
 
-                    <div className='grid-item bloque-puntos'>
-                    <h2>Puntos</h2>
-                    <h4 className="puntosConseguidos">
-                        {puntos !== null ? `${puntos} Puntos` : 'Cargando...'}
-                    </h4>
-                    </div>
-
-                    <div className="grid-item bloque-actividad-header">
-                        <h2>Tareas de tu profesor</h2>
-                    </div>
-                    
-                    {/* Sección de Tareas para usuario Logueado */}
-                    <div className='grid-item bloque-tareas-logueado'>
-                        {isLoadingTareas && <p>Cargando tareas...</p>}
-                        {errorTareas && <p style={{color: 'red'}}>{errorTareas}</p>}
-                        
-                        {!isLoadingTareas && !errorTareas && ultimasTareas.length === 0 && (
-                            <p>Tu profesor no ha asignado tareas recientes.</p>
-                        )}
-                        
-                        {!isLoadingTareas && !errorTareas && ultimasTareas.map((tarea, index) => (
-                            <div key={tarea.id} className={`grid-item bloque-tarea-item-${index + 1} task-card card-base`}>
-                                <div className='task-content'>
-                                    <div className='task-info-v2'>
-                                        <h3 className='task-title-v2'>{tarea.titulo}</h3>
-                                        <p className='task-description-v2'>{tarea.descripcion}</p>
-                                    </div>
-                                    
-                                    <div className='task-footer-v2'>
-                                        <p className='task-reward-v2'>
-                                            🏅 Puntos: {tarea.recompensa}
-                                        </p>
-                                        <p className="task-status-v2" style={{ color: getTaskStatusColor(tarea.estado_entrega)}}>
-                                            Estado: {getTaskStatusText(tarea.estado_entrega)}
-                                        </p>
-                                    </div>
-                                </div>
-                                
-                                <Link to={`/tarea/${tarea.id}`} className="task-link-v2">
-                                    Ver Tarea
-                                </Link>
-                            </div>
-                        ))}
-                                            </div>
+                    <Tareas />
 
                     {renderSongCards()}
                 </div>

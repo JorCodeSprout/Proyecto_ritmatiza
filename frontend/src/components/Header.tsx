@@ -24,7 +24,6 @@ const Header: React.FC = () => {
 
     const menuItems = [
         { id: 'inicio', name: 'Inicio', href: '/', requiresAuth: false },
-        { id: 'tareas', name: 'Tareas', href: '/tareas', requiresAuth: true },
         { id: 'musica', name: 'Música y Playlist', href: '/musica', requiresAuth: true },
         { id: 'acerca', name: 'Acerca de', href: '/acerca', requiresAuth: false },
         { id: 'contacto', name: 'Contacto', href: '/contacto', requiresAuth: false },

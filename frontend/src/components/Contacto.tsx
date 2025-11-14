@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const EMAIL_API_URL = "https://ritmatiza.local/api/contacto";
+const URL = import.meta.env.VITE_API_URL;
+const EMAIL_API_URL = `${URL}/contacto`;
 const Contacto = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
