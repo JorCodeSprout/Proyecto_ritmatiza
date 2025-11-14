@@ -1,21 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import type { LoginFormProps, User } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-interface User {
-    id: number;
-    email: string;
-    name: string;
-    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
-    puntos: number; 
-    profesor_id: number | null;
-}
-
-interface LoginFormProps {
-    onLoginSuccess: (token: string, user: User) => void; 
-}
 
 const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
     const [email, setEmail] = useState('');
@@ -36,7 +24,6 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
             });
 
             const token = response.data.access_token;
-            // Se asume que la respuesta del backend tiene user: { ..., profesor_id: X }
             const userObject: User = response.data.user; 
 
             if(token && userObject) {
@@ -64,7 +51,6 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
 
             {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
 
-            {/* Input Correo */}
             <div className='input-container'>
                 <input 
                     type="email" 
@@ -80,7 +66,6 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
                 <label htmlFor="correo">Correo corporativo</label>
             </div>
 
-            {/* Input Contraseña */}
             <div className='input-container'>
                 <input 
                     type="password" 

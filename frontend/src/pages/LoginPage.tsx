@@ -4,15 +4,7 @@ import LoginForm from '../components/LoginForm';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import '../assets/styles/formulario_inicio.css'
-
-interface User {
-    id: number;
-    email: string;
-    name: string;
-    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
-    puntos: number;
-    profesor_id: number | null;
-}
+import type { User } from '../types';
 
 
 const mainContentStyles: React.CSSProperties = {

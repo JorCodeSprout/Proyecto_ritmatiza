@@ -1,0 +1,13 @@
+.playlist-contenedor {
+    /* Agrega un poco de espacio en la parte inferior */
+    margin-bottom: 30px; 
+    
+    /* Le da un borde redondeado al contenedor */
+    border-radius: 12px; 
+    
+    /* Agrega una sombra sutil para que el reproductor destaque */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+    
+    /* Asegura que el borde redondeado funcione si el iframe es más pequeño */
+    overflow: hidden; 
+}

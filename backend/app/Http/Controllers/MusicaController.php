@@ -36,7 +36,7 @@ class MusicaController extends Controller {
      * artista --> Envía el o los artistas que participan en la canción
      *
      * Además de los datos que se enviarán con el botón de la canción, también se enviará
-     * sugerida_por_id --> Contiene el id del usuario que hizo la solicitud
+     * sugerencia_por_id --> Contiene el id del usuario que hizo la solicitud
      * estado --> Por defecto se le dará el valor de PENDIENTE, el cual cambiará una vez que se acepte o se cancele la
      *            solicitud.
      *
@@ -58,7 +58,7 @@ class MusicaController extends Controller {
             'id_spotify_cancion' => $request->id_spotify_cancion,
             'titulo' => $request->titulo,
             'artista' => $request->artista,
-            'sugerida_por_id' => Auth::id(),
+            'sugerencia_por_id' => Auth::id(),
             'estado' => 'PENDIENTE',
         ]);
 
@@ -76,13 +76,13 @@ class MusicaController extends Controller {
      */
     public function listado() {
         if(Gate::allows('profesor-or-admin')) {
-            $sugerencias = Sugerencia::with('sugeridaPor')
+            $sugerencias = Sugerencia::with('sugerencia_por_id')
                 ->where('estado', 'PENDIENTE')
                 ->get();
         }
 
-        $sugerencias = Sugerencia::with('sugeridaPor')
-            ->where('sugeridaPor', Auth::id())
+        $sugerencias = Sugerencia::with('sugerencia_por_id')
+            ->where('sugerencia_por_id', Auth::id())
             ->get();
 
         return response()->json($sugerencias);

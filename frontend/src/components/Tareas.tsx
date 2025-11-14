@@ -2,29 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from '../hooks/useAuth';
 import "../assets/styles/Tareas.css";
 import {useNavigate} from "react-router-dom";
-
-type EstadoEntrega = "PENDIENTE" | "APROBADA" | "RECHAZADA";
-
-interface Tarea {
-    id: number;
-    titulo: string;
-    descripcion: string;
-    recompensa: number;
-    creador_id: number;
-    estado_entrega?: EstadoEntrega;
-    entrega_id?: number | null;
-}
-
-interface Entrega {
-    id: number;
-    ruta: string;
-    estado: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
-    tarea: {
-        id: number;
-        titulo: string;
-        recompensa: number;
-    };
-}
+import type { Entrega, EstadoEntrega, Tarea } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL; 
 

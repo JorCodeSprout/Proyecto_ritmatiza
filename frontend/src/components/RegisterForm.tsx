@@ -1,22 +1,9 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { RegisterFormProps, User } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-// Interfaz User replicada para tipar el objeto que se pasa al AuthProvider
-interface User {
-    id: number;
-    email: string;
-    name: string;
-    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
-    puntos: number; 
-    profesor_id: number | null;
-}
-
-interface RegisterFormProps {
-    registroExitoso: (token: string, user: User) => void;
-}
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
     const [name, setName] = useState('');

@@ -43,7 +43,6 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::controller(MusicaController::class)->prefix('musica')->group(function () {
-        // Corregido: 'getPlaylsit' -> 'getPlaylist'
         Route::get('playlist', 'getPlaylist');
         // Rutas para Alumnos/Profesores/Admin
         Route::post('sugerir', 'sugerirCancion');
@@ -56,10 +55,11 @@ Route::middleware('auth:api')->group(function () {
             Route::post('crear', 'store');
             // Ver entregas
             Route::get('{tarea}/entregas', 'entregasPorTarea');
-
-            // Calificar tarea
-            Route::post('entregas/{entrega}/calificar', 'calificarEntrega');
+            
         });
+        
+        // Calificar tarea
+        Route::post('entregas/{entrega}/calificar', [TareaController::class, 'calificarEntrega']);
 
         // Ruta para ver TODAS las sugerencias
         Route::get('musica/sugerencias', [MusicaController::class, 'listado']);

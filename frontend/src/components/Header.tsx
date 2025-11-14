@@ -24,7 +24,7 @@ const Header: React.FC = () => {
 
     const menuItems = [
         { id: 'inicio', name: 'Inicio', href: '/', requiresAuth: false },
-        { id: 'musica', name: 'Música y Playlist', href: '/musica', requiresAuth: true },
+        { id: 'musica', name: 'Playlist', href: '/musica', requiresAuth: true },
         { id: 'acerca', name: 'Acerca de', href: '/acerca', requiresAuth: false },
         { id: 'contacto', name: 'Contacto', href: '/contacto', requiresAuth: false },
     ];
@@ -62,7 +62,7 @@ const Header: React.FC = () => {
                         <button onClick={handleLogout} className='cerrar'>
                             Cerrar sesión
                         </button>
-                        <Link to='/perfil' title='Ver perfil' className='user-icon'>
+                        <Link to='/me' title='Ver perfil' className='user-icon'>
                             <UserIcon  fill='#1a3a5a' />
                         </Link>
                     </>

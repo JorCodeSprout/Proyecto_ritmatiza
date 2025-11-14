@@ -7,6 +7,7 @@ import AcercaDePage from "./pages/AcercaDePage";
 import ContactoPage from "./pages/ContactoPage";
 import TareasPage from "./pages/TareasPage";
 import CrearTareasPage from "./pages/CrearTareasPage.tsx";
+import MusicPage from "./pages/MusicPage.tsx";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/contacto" element={<ContactoPage/>} />
           <Route path="/tareas" element={<TareasPage/>} />
           <Route path="/tareas/crear" element={<CrearTareasPage/>} />
+          <Route path="/musica" element={<MusicPage/>} />
         </Routes>
       </Router>
     </AuthProvider>

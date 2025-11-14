@@ -4,33 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import '../assets/styles/home.css';
 import Tareas from '../components/Tareas';
-
-interface Tarea {
-    id: number;
-    titulo: string;
-    descripcion: string;
-    recompensa: number;
-    creador_id: number | null;
-    estado_entrega?: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
-    entrega_id?: number | null;
-}
-
-interface SongItem {
-    id: string;
-    name: string;
-    external_urls: {
-        spotify: string;
-    };
-    album: {
-        name: string;
-        images: {
-            url: string;
-        }[];
-    };
-    artists: {
-        name: string;
-    }[];
-};
+import type { SongItem, Tarea } from '../types';
 
 const mainContentStyles: React.CSSProperties = {
     display: 'flex',
@@ -42,7 +16,7 @@ const mainContentStyles: React.CSSProperties = {
 const API_URL = import.meta.env.VITE_API_URL;
 const SPOTIFY_TOKEN_ENDPOINT = `${API_URL}/spotify_token`;
 
-const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap', 'Queen', 'Nirvana'];
+const RANDOM_QUERIES = ['wos', 'duki', 'quevedo', 'nicky jam', 'bizarrap', 'Queen', 'Nirvana', 'Estopa'];
 // Tiempo de renovación (59 min y 30 segundos)
 const TOKEN_REFRESH_INTERNAL = (59 * 60 + 30) * 1000; 
 
@@ -241,8 +215,9 @@ const Home: React.FC = () => {
             const imagenUrl = 
             item.album?.images?.[0]?.url;
             const nombreCancion = item.name || 'Título Desconocido';
-            // Corregir URL de Spotify
+
             const spotifyUrl = `https://open.spotify.com/track/${item.id}`;
+            
             return (
                 <article key={item.id} className={`grid-item bloque-cancion-${index + 1} song-card card-base`}>
                 {imagenUrl && <img src={imagenUrl} alt={`Portada de ${nombreCancion}`} className='song-cover' />}
@@ -298,66 +273,6 @@ const Home: React.FC = () => {
             </Layout>
         );
     }
-    
-    // return (
-    //     <Layout>
-    //         <div style={mainContentStyles} className='logged-in-layout'>
-    //             <div className='grid-container-login'>
-    //                 <div className='grid-item bloque-header-izq'>
-    //                 <h1>{bienvenido}</h1>
-    //                 <p>Explora tu música y tus actividades.</p>
-    //                 </div>
-
-    //                 <div className='grid-item bloque-puntos'>
-    //                 <h2>Puntos</h2>
-    //                 <h4 className="puntosConseguidos">
-    //                     {puntos !== null ? `${puntos} Puntos` : 'Cargando...'}
-    //                 </h4>
-    //                 </div>
-
-    //                 <div className="grid-item bloque-actividad-header">
-    //                     <h2>Tareas de tu profesor</h2>
-    //                 </div>
-                    
-    //                 {/* Sección de Tareas para usuario Logueado */}
-    //                 <div className='grid-item bloque-tareas-logueado'>
-    //                     {isLoadingTareas && <p>Cargando tareas...</p>}
-    //                     {errorTareas && <p style={{color: 'red'}}>{errorTareas}</p>}
-                        
-    //                     {!isLoadingTareas && !errorTareas && ultimasTareas.length === 0 && (
-    //                         <p>Tu profesor no ha asignado tareas recientes.</p>
-    //                     )}
-                        
-    //                     {!isLoadingTareas && !errorTareas && ultimasTareas.map((tarea, index) => (
-    //                         <div key={tarea.id} className={`grid-item bloque-tarea-item-${index + 1} task-card card-base`}>
-    //                             <div className='task-content'>
-    //                                 <div className='task-info-v2'>
-    //                                     <h3 className='task-title-v2'>{tarea.titulo}</h3>
-    //                                     <p className='task-description-v2'>{tarea.descripcion}</p>
-    //                                 </div>
-                                    
-    //                                 <div className='task-footer-v2'>
-    //                                     <p className='task-reward-v2'>
-    //                                         🏅 Puntos: {tarea.recompensa}
-    //                                     </p>
-    //                                     <p className="task-status-v2" style={{ color: getTaskStatusColor(tarea.estado_entrega)}}>
-    //                                         Estado: {getTaskStatusText(tarea.estado_entrega)}
-    //                                     </p>
-    //                                 </div>
-    //                             </div>
-                                
-    //                             <Link to={`/tarea/${tarea.id}`} className="task-link-v2">
-    //                                 Ver Tarea
-    //                             </Link>
-    //                         </div>
-    //                     ))}
-    //                                         </div>
-
-    //                 {renderSongCards()}
-    //             </div>
-    //         </div>
-    //     </Layout>
-    // );
 
     const profesor_admin = role === 'PROFESOR' || role === 'ADMIN';
 
@@ -371,10 +286,6 @@ const Home: React.FC = () => {
                             <p>Gestión y administración de la plataforma.</p>
                             <Tareas />
                         </div>
-
-                        <h1>Canciones</h1>
-                        {renderSongCards()}
-                        
                     </div>
                 </div>
             </Layout>
@@ -390,8 +301,6 @@ const Home: React.FC = () => {
                     </div>
 
                     <Tareas />
-
-                    {renderSongCards()}
                 </div>
             </div>
         </Layout>

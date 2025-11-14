@@ -1,14 +1,8 @@
 import {useAuth} from "../hooks/useAuth.ts";
 import {useState} from "react";
+import type { NuevaTarea } from "../types/index.tsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-interface NuevaTarea {
-    titulo: string;
-    descripcion: string;
-    recompensa: number;
-    reenviar: boolean;
-}
 
 const CrearTarea: React.FC = () => {
     const {role, token} = useAuth();
@@ -58,7 +52,6 @@ const CrearTarea: React.FC = () => {
         setLoading(true);
 
         try {
-            // ✅ CORRECCIÓN 1: La URL final es API_URL + "tareas/crear"
             const response = await fetch(API_URL + "tareas/crear", {
                 method: "POST",
                 headers: {
@@ -70,25 +63,20 @@ const CrearTarea: React.FC = () => {
 
             const clonedResponse = response.clone();
 
-            // ✅ CORRECCIÓN 2: Manejo de respuesta robusto para evitar error JSON
             if (!response.ok) {
                 let errorBody= { message: `Error HTTP ${response.status}: El servidor no pudo procesar la solicitud.` };
 
                 try {
-                    // Intenta leer el JSON de error
                     errorBody = await response.json();
                 } catch {
-                    // Si falla la lectura (es HTML, texto simple o vacío), lee el texto
                     const textError = await clonedResponse.text();
                     errorBody.message = `Fallo de servidor (${response.status}). Respuesta: ${textError.substring(0, 100)}...`;
                 }
 
-                // Genera un mensaje de error legible
                 const errorMessage = errorBody.message || JSON.stringify(errorBody || errorBody);
                 throw new Error(errorMessage);
             }
 
-            // Si la respuesta es OK (2xx), procede a leer el JSON
             const result = await response.json();
 
             setSuccess(`Tarea ${result.tarea.titulo}, creada con éxito.`);
@@ -110,17 +98,14 @@ const CrearTarea: React.FC = () => {
         );
     }
 
-    // ----------------------------------------------------
-    // JSX (Muestra de formulario - sin cambios)
-    // ----------------------------------------------------
     return (
         <div className="tarea-form-container">
-            <h2>Crear Nueva Tarea</h2>
 
             {error && <p className="error-message">{error}</p>}
             {success && <p className="success-message">{success}</p>}
 
             <form onSubmit={handleSubmit} className="form-crear-tarea">
+                <h2>Crear Nueva Tarea</h2>
 
                 <div className="input-container">
                     <input
