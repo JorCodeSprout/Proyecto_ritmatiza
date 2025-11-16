@@ -1,394 +1,559 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useAuth } from '../hooks/useAuth';
-import "../assets/styles/Tareas.css";
-import {useNavigate} from "react-router-dom";
+/*
+TODO
+=============== 
+1.- Mostrar todas las tareas creadas
+2.- Mostrar todas las tareas creadas por un profesor específico
+3.- Mostrar las entregas realizadas en las tareas por un profesor (Primero hay que ir a backend a corregir el método que las recoge)
+4.- Botón para crear tareas
+5.- Botón para aprobar entrega
+6.- Botón para suspender entrega
+7.- Ventana distinta para cada rol
+
+PETICIONES
+===========================
+Listar tareas --> GET - /tareas
+Entregar --> POST - /tareas/id_tarea/entregar
+Ver mis entregas --> GET - /tareas/mis-entregas
+Últimas tareas creadas --> GET - /tareas/ultimas
+
+profesores o admin
+---------------------------
+Crear --> POST - /tareas/crear
+Ver entregas --> GET - /tareas/id_tarea/entregas (Obtener el id de todas las entregas que tengan el creador_id del profesor o admin logueado)
+Calificar --> POST /entregas/entrega_id/calificar
+*/
+
+import type React from "react";
 import type { Entrega, EstadoEntrega, Tarea } from "../types";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "../assets/styles/Tareas.css";
 
-const API_URL = import.meta.env.VITE_API_URL; 
+const URL = import.meta.env.VITE_API_URL;
 
-const fetchTareas = async (profesorId: number | null, token: string | null): Promise<Tarea[]> => {
+const fetchTareasByProfesor = async (profesor_id: number | null, token: string | null): Promise<Tarea[]> => {
     let url: string;
-    
-    const headers: Record<string, string> = { 
-        'Content-Type': 'application/json' 
-    }; 
 
-    if (token && profesorId) {
-        url = `${API_URL}/tareas/profesor/${profesorId}`;
-        headers['Authorization'] = `Bearer ${token}`; 
-    } 
-    else {
-        url = `${API_URL}/tareas/ultimas`;
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+    };
+
+    if(token && profesor_id) {
+        url = `${URL}/tareas/profesor/${profesor_id}`;
+        headers['Authorization'] = `Bearer ${token}`;
+    } else {
+        url = `${URL}/tareas/ultimas`;
     }
-    
+
     try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            throw new Error(`Error ${response.status} al cargar tareas: ${response.statusText}`);
+        const response = await fetch(url, {headers});
+        if(!response.ok) {
+            throw new Error(`Error al cargar las tareas. ${response.statusText}`);
         }
-        return await response.json();
-    } catch (error) {
-        console.error("Fallo al obtener tareas:", error);
-        return [];
-    }
-};
 
-const fetchMisEntregas = async (token: string): Promise<Entrega[]> => {
+        return await response.json();
+    } catch(err) {
+        console.error("Fallo al obtener las tareas: ", err);
+        return[];        
+    }
+} 
+
+const fetchTodasTareas = async (token: string | null): Promise<Tarea[]> => {
     try {
-        const response = await fetch(`${API_URL}/tareas/mis-entregas`, {
+        const response = await fetch(`${URL}/tareas/ultimas`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
+                'Content-Type': 'application/json'
+            }
         });
-        if (!response.ok) {
-            throw new Error(`Error al cargar mis entregas: ${response.statusText}`);
+
+
+        if(!response.ok) {
+            throw new Error(`Error al cargar las tareas: ${response.statusText}`);
         }
+
         return await response.json();
-    } catch (error) {
-        console.error("Fallo al obtener mis entregas:", error);
+    } catch(err) {
+        console.error("Fallo al obtener las tareas: ", err);
+        return[];        
+    }
+}
+
+const fetchMisEntregas = async (token: string) : Promise<Entrega[]> => {
+    try {
+        const response = await fetch(`${URL}/tareas/mis-entregas`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if(!response.ok) {
+            throw new Error(`Error al cargar las entregas que has realizado: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch(err) {
+        console.error("Fallo al obtener las entregas: ", err);
         return [];
     }
-};
+}
+
+const fetchTodasEntregas = async (token: string, profesor_id: number) : Promise<Entrega[]> => {
+    try {
+        const response = await fetch(`${URL}/tareas/${profesor_id}/entregas`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+
+        if(!response.ok) {
+            throw new Error(`Error al cargar las entregas: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch(err) {
+        console.error("Fallo al obtener las entregas: ", err);
+        return[];        
+    }
+}
 
 const Tareas: React.FC = () => {
-    const { isLogged, role, puntos, profesorId, token } = useAuth();
+    const {isLogged, role, puntos, profesorId, id, token} = useAuth();
     const navigate = useNavigate();
 
-    const [tareasDisponibles, setTareasDisponibles] = useState<Tarea[]>([]); 
+    const [tareasDisponibles, setTareasDisponibles] = useState<Tarea[]>([]);
+    const [entregas, setEntregas] = useState<Entrega[]>([]);
     const [misEntregas, setMisEntregas] = useState<Entrega[]>([]);
+
     const [loading, setLoading] = useState(true);
 
     const handleCrearTarea = async () => {
         if(role !== "PROFESOR" && role !== "ADMIN") {
-            alert("No tienes permisos para crear tareas");
+            alert("No tienes permisos suficientes para crear una tarea.");
             return;
         }
 
-        navigate('/tareas/crear');
+        navigate("/tareas/crear");
     }
 
-    const loadTareasData = useCallback(async () => {
+    const handleSubirEntrega = async (tarea_id:number, archivo: File) => {
+        if(!token) {
+            alert("Debes iniciar sesión para realizar una entrega");
+            return;
+        }
+
         setLoading(true);
+
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+
         try {
-            const tareas = await fetchTareas(profesorId, token);
-            
-            let entregas: Entrega[] = [];
-            if (isLogged && token && role === 'ESTUDIANTE') {
-                entregas = await fetchMisEntregas(token);
-                setMisEntregas(entregas);
+            const response = await fetch(`${URL}/tareas/${tarea_id}/entregar`, {
+                method:'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if(!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || `Error al subir la entrega. Status ${response.statusText}`);
             }
 
-            const tareasConEstado = tareas.map(tarea => {
-                const entregaExistente = entregas.find(e => e.tarea.id === tarea.id);
+            const nuevaEntrega: Entrega = await response.json();
+            setMisEntregas(prev => [nuevaEntrega, ...prev.filter(e => e.tarea_id !== tarea_id)]);
 
-                const estado: EstadoEntrega = entregaExistente ? (entregaExistente.estado as EstadoEntrega) : "PENDIENTE";
-                
-                return {
-                    ...tarea,
-                    estado_entrega: estado,
-                    entrega_id: entregaExistente ? entregaExistente.id : null,
-                };
-            });
-            setTareasDisponibles(tareasConEstado);
+            alert("Entrega subida con éxito: " + archivo.name);
 
-        } catch (error) {
-            console.error("Fallo general al cargar datos de tareas:", error);
+            await loadTareas();
+            await loadEntregas();
+        } catch(err) {
+            console.error(`Error al subir la tarea: ${err}`);            
         } finally {
             setLoading(false);
         }
-    }, [isLogged, role, profesorId, token]);
-    
-    const handleSubirEntrega = async (tareaId: number, archivo: File) => {
-        if (!token) {
-            console.error("No hay token de autenticación.");
+    }
+
+    const SubidaArchivos: React.FC<{tarea_id: number}> = ({tarea_id}) => {
+        const [archivo, setArchivo] = useState<File | null>(null);
+
+        const fileInputRef = useRef<HTMLInputElement>(null); 
+
+        const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if(e.target.files && e.target.files.length > 0) {
+                setArchivo(e.target.files[0]);
+            } else {
+                setArchivo(null);
+            }
+        }
+
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if(archivo) {
+                handleSubirEntrega(tarea_id, archivo);
+            } else {
+                alert("Por favor, selecciona un archivo.");
+            }
+        }
+
+        const handleCustomButtonClick = () => {
+            const inputElement = fileInputRef.current;
+        
+            if (inputElement) {
+                inputElement.focus();
+
+                setTimeout(() => {
+                    inputElement.click();
+                }, 0); 
+            }
+        }
+
+        return (
+            <form onSubmit={handleSubmit} className="entrega-form">
+                
+                <input type="file" name="archivo" id="archivo" onChange={handleFile} required ref={fileInputRef} accept=".pdf, image/jpeg, image/png," style={{ display: 'none' }} />
+                
+                <div className="custom-file-upload">
+                    <button type="button" onClick={handleCustomButtonClick} className="btn-elegir-archivo-custom">
+                        Elegir archivo
+                    </button>
+                    
+                    <span className="file-status">
+                        {archivo ? archivo.name : "No se ha seleccionado ningún archivo"}
+                    </span>
+                </div>
+
+                <button type="submit" disabled={!archivo || loading} >
+                    {loading ? "Subiendo..." : "Subir entrega"}
+                </button>
+            </form>
+        );
+    }
+
+    const calificar = async (entrega_id: number, estado: "APROBADA" | "RECHAZADA", token: string) => {
+        try {
+            const response = await fetch(`${URL}/entregas/${entrega_id}/calificar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({estado})
+            });
+
+            if(!response.ok) {
+                throw new Error("Error al calificar la entrega");
+            }
+            return response.json();
+        } catch(err) {
+            console.error(`No se ha podido calificar la entrega: ${err}`);
+            throw err;
+        }
+    }
+
+    const handleCalificar = async (entrega_id: number, estado: "APROBADA" | "RECHAZADA") => {
+        if(!token) {
+            alert("Debes estar autenticado para poder calificar una tarea.");
             return;
         }
 
-        const rutaArchivo = `uploads/${tareaId}_${archivo.name}`; 
+        try {
+            setLoading(true);
+            await calificar(entrega_id, estado, token);
+            alert(`Entrega ${entrega_id} marcada como ${estado}`);
+            await loadEntregas();
+        } catch(err) {
+            console.error(`Error al actualizar la entrega: ${err}`);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const loadEntregas = useCallback(async () => {
+        setLoading(true);
 
         try {
-            console.log(`Simulando POST a ${API_URL}/tareas/${tareaId}/entregar con ruta: ${rutaArchivo}`);
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const nuevaEntrega: Entrega = { 
-                id: Date.now(), 
-                ruta: rutaArchivo, 
-                estado: 'PENDIENTE', 
-                tarea: { id: tareaId, titulo: "Tarea Simulado", recompensa: 0 }
-            };
+            let entregas: Entrega[] = [];
 
-            setMisEntregas(prev => [nuevaEntrega, ...prev.filter(e => e.tarea.id !== tareaId)]);
-
-            console.log(`Entrega subida con éxito: ${archivo.name}. Pendiente de calificación.`);
-            
-            await loadTareasData();
-
-        } catch (error) {
-            console.error("Fallo al subir entrega (simulado):", error);
-            console.error(`Error: ${error instanceof Error ? error.message : 'No se pudo subir la entrega.'}`);
+            if(isLogged && token) {
+                if(role === "ESTUDIANTE") {
+                    entregas = await fetchMisEntregas(token);
+                    setMisEntregas(entregas);
+                } else {
+                    if(id !== null) {
+                        entregas = await fetchTodasEntregas(token, id);
+                        setEntregas(entregas);
+                    }
+                }
+            } else {
+                throw new Error("Has de estar logueado para ver las entregas");
+            }
+        } catch(err) {
+            console.error("Fallo al cargar las tareas: ", err);
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [isLogged, role, id, token]);
 
+    const loadTareas = useCallback(async () => {        
+        let fetchedTareas: Tarea[];
+
+        if(role === "PROFESOR" || role === "ADMIN") {
+            fetchedTareas = await fetchTodasTareas(token);
+        } else {
+            fetchedTareas = await fetchTareasByProfesor(profesorId, token);
+        }
+        setTareasDisponibles(fetchedTareas);
+    }, [profesorId, token, role]);
 
     useEffect(() => {
-        loadTareasData();
-    }, [loadTareasData]); 
+        loadTareas();
+
+        if(isLogged) {
+            loadEntregas();
+        } else {
+            setEntregas([]);
+            setMisEntregas([]);
+            setLoading(false);
+        }
+    }, [isLogged, loadEntregas, loadTareas]);
     
-    const getStatusClass = (status: Tarea['estado_entrega']) => {
-        const normalizedStatus = (status || 'SIN ENTREGAR').toLowerCase().replace(' ', '-');
-        return `estado-${normalizedStatus}`;
+    const getEstadoEntrega = (tarea_id: number) => {
+        return misEntregas.find(e => e.tarea_id === tarea_id);
+    }
+
+    const TareaCard: React.FC<{tarea: Tarea}> = ({tarea}) => {
+        const entrega = getEstadoEntrega(tarea.id);
+        const colores = (estado: EstadoEntrega) => {
+            switch(estado) {
+                case "APROBADA": return "green";
+                case "RECHAZADA": return "red";
+                default: return "orange";
+            }
+        };
+
+        return (
+            <div className="tarea-card" key={tarea.id}>
+                <h4>{tarea.titulo}</h4>
+                <p><strong>Descripción: </strong>{tarea.descripcion}</p>
+                <p><strong>Recompensa: </strong>{tarea.recompensa} 🌟</p>
+
+                {isLogged && role === "ESTUDIANTE" && (
+                    <div className="entrega-info">
+                        {entrega 
+                            ? (
+                                <>
+                                    <p>
+                                        <strong>Estado de tu entrega: </strong>
+                                        <span style={{color: colores(entrega.estado)}}>{entrega.estado} ({entrega.ruta})</span>
+                                    </p>
+                                    <SubidaArchivos tarea_id={tarea.id} />
+                                </>    
+                            )
+                            : (
+                                <SubidaArchivos tarea_id={tarea.id} />
+                            )
+                        }
+                    </div>
+                )}
+            </div>
+        );
     };
 
+    const ContinidoNoLogueado: React.FC = () => {
+        return (
+            <>
+                <div className="tareas-seccion">
+                    <h3>📜 Últimas tareas generadas</h3>
+                    <p>Estas son las últimas tareas visibles para todos:</p>
 
-    const renderContentByRole = () => {
-        if (loading) {
-            return <p>Cargando información de tareas...</p>;
+                    {tareasDisponibles.length > 0 
+                        ? (
+                            <div className="lista-tareas">
+                                {tareasDisponibles.map(tarea => (
+                                    <div className="tarea-card" key={tarea.id}>
+                                        <h4>{tarea.titulo}</h4>
+                                        <p><strong>Descripción:</strong> {tarea.descripcion}</p>
+                                        <p><strong>Puntos: </strong>{tarea.recompensa}🌟</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                        : (
+                            <p>No hay tareas disponibles en este momento.</p>
+                        )
+                    }
+                </div>
+            </>
+        );
+    }
+
+    const ContendioEstudiante: React.FC = () => {
+        return (    
+            <>
+                <h2>Panel de ESTUDIANTE</h2>
+                <hr />
+                <p className="puntos-actuales">
+                    Puntos actuales: <strong style={{color: "#fff"}}>{puntos} 🌟</strong>
+                </p>
+
+                <div className="tareas-seccion">
+                    <h3>
+                        {profesorId 
+                            ? "✅Tareas de tu profesor" 
+                            : "📜Tareas generales"
+                        }
+                    </h3>
+                    <p>
+                        {profesorId 
+                            ? "Aquí puedes ver el estado de las tareas de tu profesor y subir entregas" 
+                            : "No tienes ningún profesor asignado. Viendo las últimas tareas publicadas."
+                        }
+                    </p>
+
+                    {tareasDisponibles.length > 0
+                        ? (
+                            <div className="lista-tareas">
+                                {tareasDisponibles.map(tarea => (<TareaCard key={tarea.id} tarea={tarea} />))}
+                            </div>
+                        )
+                        : (
+                            <p>No hay tareas disponibles en este momento</p>
+                        )
+                    }
+                </div>
+
+                <div className="seccion-entregas-corregir">
+                    <h3>Entregas realizadas</h3>
+                    {misEntregas.length > 0
+                        ? (
+                            <div className="lista-entregas">
+                                {misEntregas.map(entrega => (
+                                    <div key={entrega.id} className="enterga-item">
+                                        <h4>Tarea: {entrega.tarea_titulo}</h4>
+                                        <p>
+                                            <strong>Archivo:</strong> {entrega.ruta}
+                                        </p>
+                                        <p style={{color: 
+                                            entrega.estado === "PENDIENTE" ? "orange"
+                                            : entrega.estado === "APROBADA" ? "green"
+                                            : "red"
+                                        }}>
+                                            <strong style={{color: "black"}}>Estado:</strong> {entrega.estado}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                        : (
+                            <p>No has realizado ninguna entrega todavía.</p>
+                        )
+                    }
+                </div>
+            </>
+        );
+    }
+
+    const ContenidoAdminProfesor = () => {
+        return (
+            <>
+                <h2>Panel de PROFESOR</h2>
+                <hr />
+                <div className="acciones-profesor">
+                    <button onClick={handleCrearTarea} className="btn-crear">
+                        ➕ Crear nueva tarea
+                    </button>
+                </div>
+
+                <div className="seccion-entregas-corregir">
+                    <h3>Entregas pendientes de calificar</h3>
+                    {entregas.length > 0
+                        ? (
+                            <div className="lista-entregas">
+                                {entregas.map(entrega => (
+                                    <div key={entrega.id} className="enterga-item">
+                                        <h4>Tarea: {entrega.tarea_titulo}</h4>
+                                        <p>
+                                            <strong>Estudiante ID:</strong> {entrega.estudiante_id}
+                                        </p>
+                                        <p>
+                                            <strong>Archivo:</strong> {entrega.ruta}
+                                        </p>
+                                        <p style={{color: 
+                                            entrega.estado === "PENDIENTE" ? "orange"
+                                            : entrega.estado === "APROBADA" ? "green"
+                                            : "red"
+                                        }}>
+                                            <strong style={{color: "black"}}>Estado:</strong> {entrega.estado}
+                                        </p>
+                                        <div className="acciones-calificacion">
+                                            <button onClick={() => handleCalificar(entrega.id, "APROBADA")} className="btn-aprobar">✅ Aprobar</button>
+                                            <button onClick={() => handleCalificar(entrega.id, "RECHAZADA")} className="btn-suspender">❌ Suspender</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                        : (
+                            <p>No hay entregas pendientes para calificar.</p>
+                        )
+                    }
+                </div>
+                <hr />
+                <div className="seccion-tareas-creadas">
+                    <h3>Tareas disponibles actualmente</h3>
+                    {tareasDisponibles.length > 0 
+                        ? (
+                            <div className="lista-tareas">
+                                {tareasDisponibles.map(tarea => (
+                                    <div key={tarea.id} className="tarea-card">
+                                        <h4>{tarea.titulo}</h4>
+                                        <p>Puntos: {tarea.recompensa} 🌟</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                        : (
+                            <p>No has creado ninguna tarea todavía</p>
+                        )
+                    }
+                </div>
+            </>
+        );
+    }
+
+    const contenidoSegunRole = () => {
+        if(loading) {
+            return <p>Cargando información de tareas y entregas...</p>
         }
-        
-        const viewClass = role === 'ESTUDIANTE' ? 'tareas-estudiante-view' : 'tareas-profesor-admin-view';
 
-        switch (role) {
-            case 'ESTUDIANTE':
-                return (
-                    <div className={viewClass}>
-                        <p className="puntos-actuales">
-                            Puntos actuales: <strong>{puntos} 🎵</strong>
-                        </p>
-                        
-                        <div className="tareas-seccion">
-                            <h3>
-                                {profesorId ? `✅ Tareas de tu Profesor (${profesorId})` : '📜 Tareas Globales Recientes'}
-                            </h3>
-                            <p>
-                                {profesorId 
-                                    ? 'Aquí puedes ver el estado de las últimas tareas de tu profesor.'
-                                    : 'No tienes profesor asignado. Viendo las últimas tareas publicadas globalmente.'
-                                }
-                            </p>
-                            <ListaTareasEstudiante tareas={tareasDisponibles} onSubirEntrega={handleSubirEntrega} getStatusClass={getStatusClass} />
-                        </div>
+        if(!isLogged) {
+            return <ContinidoNoLogueado />;
+        }
 
-                        <div className="tareas-seccion">
-                            <h3>📥 Mis Entregas Recientes</h3>
-                            <ListaMisEntregas entregas={misEntregas} getStatusClass={getStatusClass} />
-                        </div>
-                    </div>
-                );
-            case 'PROFESOR':
-            case 'ADMIN':
-                return (
-                    <div className={viewClass}>
-                        <div className="tareas-seccion">
-                            <h3>📝 Creación de Tareas</h3>
-                            <p>
-                                Aquí se ubicaría el formulario para crear una nueva tarea.
-                            </p>
-                            <button className="btn-crear" onClick={handleCrearTarea}>
-                                Crear Nueva Tarea
-                            </button>
-                        </div>
-                        
-                        <div className="tareas-seccion">
-                            <h3>📊 Tareas Pendientes de Calificar</h3>
-                            <p>
-                                Aquí se listarían las tareas con entregas pendientes.
-                            </p>
-                        </div>
-                        
-                        <div className="tareas-seccion">
-                            <h3>📋 Todas las Tareas</h3>
-                            <p>Aquí se muestra el listado completo de tareas.</p>
-                        </div>
-                    </div>
-                );
+        switch(role) {
+            case "ESTUDIANTE":
+                return <ContendioEstudiante />
+            case "ADMIN":
+            case "PROFESOR":
+                return <ContenidoAdminProfesor />
             default:
-                return (
-                    <div className="vista-publica">
-                        <h2>¡Bienvenido/a a Ritmatiza!</h2>
-                        <p>Inicia sesión para gestionar tus tareas.</p>
-                    </div>
-                );
+                return <ContinidoNoLogueado />
         }
-    };
-
+    }
 
     return (
-        <div className="tareas-page">
-
-            <header className="tareas-header">
-                <h1>
-                    {role ? `Tareas - Panel de ${role}` : 'Tareas'}
-                </h1>
-            </header>
-
-            <main className="tareas-main-content">
-                <div className={role === 'ESTUDIANTE' ? 'tareas-estudiante-view' : 'tareas-profesor-admin-view'}>
-                    {renderContentByRole()}
-                </div>
-
-                <div className="ultimas-tareas-global">
-                    <h2>🔥 Últimas Tareas Publicadas (Global)</h2>
-                    <ListaUltimasTareas tareas={tareasDisponibles} /> 
-                </div>
-            </main>
+        <div className="tareas-container">
+            <h1>Gestión de Tareas</h1>
+            <hr />
+            {contenidoSegunRole()}
         </div>
     );
-};
+}
 
 export default Tareas;
-
-const ListaUltimasTareas: React.FC<{ tareas: Tarea[] }> = ({ tareas }) => (
-    <>
-    <ul className="lista-ultimas-ul">
-        {tareas.length === 0 ? (
-            <p>No hay tareas publicadas.</p>
-        ) : (
-            tareas.slice(0, 5).map(tarea => (
-                <li key={tarea.id} className="ultima-tarea-item">
-                    <h4>
-                        <span>{tarea.titulo} </span>
-                        <span className="recompensa">
-                            <strong>{tarea.recompensa}</strong> 🎵
-                        </span>
-                    </h4>
-                    <p>
-                        {tarea.descripcion.substring(0, 70)}{tarea.descripcion.length > 70 ? '...' : ''}
-                    </p>
-                </li>
-            ))
-        )}
-    </ul>
-    </>
-);
-
-
-interface SubirEntregaBotonProps {
-    tareaId: number;
-    onSubirEntrega: (tareaId: number, archivo: File) => void; 
-}
-
-const SubirEntregaBoton: React.FC<SubirEntregaBotonProps> = ({ tareaId, onSubirEntrega }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null); 
-    const acceptedTypes = ".pdf, .jpg, .jpeg, .png, .gif, .zip";
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files ? event.target.files[0] : null;
-
-        if (file) {
-            const maxSize = 5 * 1024 * 1024; // 5 MB
-            if (file.size > maxSize) {
-                console.warn("El archivo es demasiado grande. El límite es 5MB.");
-                event.target.value = ''; 
-                return;
-            }
-            
-            onSubirEntrega(tareaId, file);
-        }
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
-    
-    const handleClick = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click(); 
-        }
-    };
-
-    return (
-        <>
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-                accept={acceptedTypes} 
-            />
-            
-            <button 
-                onClick={handleClick}
-            >
-                Subir Entrega
-            </button>
-        </>
-    );
-};
-
-
-interface ListaTareasEstudianteProps {
-    tareas: Tarea[];
-    onSubirEntrega: (tareaId: number, archivo: File) => void;
-    getStatusClass: (status: Tarea['estado_entrega']) => string; 
-}
-
-const ListaTareasEstudiante: React.FC<ListaTareasEstudianteProps> = ({ tareas, onSubirEntrega, getStatusClass }) => (
-    <ul className="tarea-list">
-        {tareas.length === 0 ? (
-            <p>No hay tareas disponibles en este momento.</p>
-        ) : (
-            tareas.map(tarea => (
-                <li key={tarea.id} className={`tarea-item-card ${getStatusClass(tarea.estado_entrega)}`}>
-                    <div className="tarea-header">
-                        <h4>{tarea.titulo}</h4>
-                        <p className="recompensa">
-                            Recompensa: <strong>{tarea.recompensa}</strong> 🎵
-                        </p>
-                    </div>
-                    
-                    <p className="tarea-descripcion">{tarea.descripcion}</p>
-                    
-                    <div className="estado-entrega">
-                        <p>
-                            Estado: 
-                            <span>
-                                {tarea.estado_entrega || 'SIN ENTREGAR'}
-                            </span>
-                        </p>
-                        
-                        {/* Solo muestra el botón si no está APROBADA */}
-                        {tarea.estado_entrega !== 'APROBADA' && (
-                            <SubirEntregaBoton tareaId={tarea.id} onSubirEntrega={onSubirEntrega} />
-                        )}
-                    </div>
-                </li>
-            ))
-        )}
-    </ul>
-);
-
-interface ListaMisEntregasProps {
-    entregas: Entrega[];
-    getStatusClass: (status: Tarea['estado_entrega']) => string; 
-}
-
-const ListaMisEntregas: React.FC<ListaMisEntregasProps> = ({ entregas, getStatusClass }) => (
-    <ul className="entrega-list">
-        {entregas.length === 0 ? (
-            <p>Aún no has realizado ninguna entrega.</p>
-        ) : (
-            entregas.map(entrega => (
-                <li key={entrega.id} className={`entrega-item-card ${getStatusClass(entrega.estado as Tarea['estado_entrega'])}`}>
-                    <div className="entrega-header">
-                        <h4>Tarea: {entrega.tarea.titulo}</h4>
-                        <p className="recompensa">
-                            Recompensa: <strong>{entrega.tarea.recompensa}</strong> 🎵
-                        </p>
-                    </div>
-                    
-                    <div className="estado-entrega">
-                        <p>
-                            <strong>Estado:</strong> 
-                            <span>
-                                {entrega.estado}
-                            </span>
-                        </p>
-                    </div>
-                    <p style={{marginTop: '10px'}}>Ruta: {entrega.ruta}</p>
-                </li>
-            ))
-        )}
-    </ul>
-);

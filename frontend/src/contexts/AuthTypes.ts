@@ -15,7 +15,7 @@ export interface AuthContextType {
     userName: User['name'] | null;
     role: User['role'] | null;
     puntos: User['puntos'] | null;
-    profesorId: User["profesor_id"] | null;
+    profesorId: User["profesor_id"];
     
     isLogged: boolean;
     token: string | null;

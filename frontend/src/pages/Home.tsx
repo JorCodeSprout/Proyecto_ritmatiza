@@ -3,8 +3,8 @@ import Layout from '../components/Layout';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import '../assets/styles/home.css';
-import Tareas from '../components/Tareas';
 import type { SongItem, Tarea } from '../types';
+import Tareas from '../components/Tareas';
 
 const mainContentStyles: React.CSSProperties = {
     display: 'flex',

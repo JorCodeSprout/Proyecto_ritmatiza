@@ -33,7 +33,6 @@ const Header: React.FC = () => {
 
     return (
         <header>
-            {/* Logo */}
             <Link to="/">
                 <img 
                     src="../public/images/RITMATIZA.png"
@@ -42,7 +41,6 @@ const Header: React.FC = () => {
                 />
             </Link>
 
-            {/* Menú de Navegación */}
             <nav className='menu'>
                 <ul>
                     {menuLinksAMostrar.map((item) => (
@@ -55,14 +53,13 @@ const Header: React.FC = () => {
                 </ul>
             </nav>
 
-            {/* Botones de Acceso */}
             <div id="acceso">
                 {isLogged ? (
                     <>
                         <button onClick={handleLogout} className='cerrar'>
                             Cerrar sesión
                         </button>
-                        <Link to='/me' title='Ver perfil' className='user-icon'>
+                        <Link to='/perfil' title='Ver perfil' className='user-icon'>
                             <UserIcon  fill='#1a3a5a' />
                         </Link>
                     </>

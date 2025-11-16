@@ -9,7 +9,7 @@ const Musica: React.FC = () => {
                 <div className="grid-item bloque-header">
                     <div className="header-content">
                         <h1>RITMATIZANDO ALUMNOS</h1>
-                        <p><Link to="/me">Ve a tu perfil</Link> para poder sugerir tu canción favorita</p>
+                        <p><Link to="/perfil">Ve a tu perfil</Link> para poder sugerir tu canción favorita</p>
                     </div>
                 </div>
                 

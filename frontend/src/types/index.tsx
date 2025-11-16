@@ -57,10 +57,9 @@ export interface SongItem {
 export interface Entrega {
     id: number;
     ruta: string;
-    estado?: EstadoEntrega;
-    tarea: {
-        id: number;
-        titulo: string;
-        recompensa: number;
-    };
+    estado: EstadoEntrega;
+    estudiante_id?: number;
+    tarea_id:  number;
+    tarea_titulo: string;
+    tarea_recompensa: number;
 }

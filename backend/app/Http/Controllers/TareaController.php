@@ -159,12 +159,16 @@ class TareaController extends Controller {
      * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes. La devolución
      * de este método consiste en un objeto JSON con todas las entregas.
      */
-    public function entregasPorTarea(Tarea $tarea) {
+    public function entregasPorTarea($creador_id) {
         if(Gate::denies('profesor-or-admin')) {
             return response()->json(['error' => 'No tienes permiso para ver todas las entregas'], 403);
         }
-
-        $entregas = $tarea->entregas()->with('estudiante')->get();
+        
+        $entregas = Entrega::join('tareas', 'entregas.tarea_id', '=', 'tareas.id')
+            ->where('tareas.creador_id', $creador_id)
+            ->select('entregas.*', 'tareas.titulo as tarea_titulo', 'tareas.recompensa as tarea_recompensa')
+            ->get();
+            
         return response()->json($entregas);
     }
 
@@ -174,7 +178,13 @@ class TareaController extends Controller {
      * Este método consiste en mostrar todas las entregas que ha realizado un usuario estudiante.
      */
     public function misEntregas() {
-        $entregas = Auth::user()->entregas()->with('tarea')->get();
+        $user = Auth::user();
+
+        $entregas = Entrega::join('tareas', 'entregas.tarea_id', '=', 'tareas.id')
+            ->where('estudiante_id', $user->id)
+            ->select('entregas.*', 'tareas.titulo as tarea_titulo', 'tareas.recompensa as tarea_recompensa')
+            ->get();
+            
         return response()->json($entregas);
     }
 

@@ -52,7 +52,7 @@ const CrearTarea: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(API_URL + "tareas/crear", {
+            const response = await fetch(API_URL + "/tareas/crear", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

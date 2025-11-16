@@ -44,7 +44,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(MusicaController::class)->prefix('musica')->group(function () {
         Route::get('playlist', 'getPlaylist');
-        // Rutas para Alumnos/Profesores/Admin
         Route::post('sugerir', 'sugerirCancion');
         Route::get('buscar-spotify', 'buscarSpotify');
     });
@@ -54,7 +53,7 @@ Route::middleware('auth:api')->group(function () {
             // Crear tarea
             Route::post('crear', 'store');
             // Ver entregas
-            Route::get('{tarea}/entregas', 'entregasPorTarea');
+            Route::get('{profesor_id}/entregas', 'entregasPorTarea');
             
         });
         
