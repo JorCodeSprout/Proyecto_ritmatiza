@@ -31,6 +31,7 @@ hr {
 .tareas-columna {
     flex: 1; 
     min-width: 300px;
+    display: inline-block;
 }
 
 .entregas-columna {
@@ -43,11 +44,15 @@ hr {
     background-color: #f8f9fa;
     padding: 18px 20px;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border-left: 5px solid;
+    border-left: 5px solid #007bff;
     margin-bottom: 15px;
     position: relative; 
     overflow: hidden;
+}
+
+.tarea-card:hover {
+    border-right: 5px solid #007bff;
+    border-left: 0px;
 }
 
 .tarea-card:hover {
@@ -67,7 +72,6 @@ hr {
 
 .tarea-card p {
     margin: 3px 0;
-    font-size: 0.95em;
     color: #555;
     line-height: 1.4;
 }
@@ -76,6 +80,14 @@ hr {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed #ddd;
+}
+
+.lista-tareas { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+    gap: 20px;
+    padding: 0;
+    margin: 0;
 }
 
 .lista-entregas {
@@ -97,28 +109,6 @@ hr {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
-}
-
-.entrega-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 5px;
-    background-color: #ccc; 
-}
-
-.entrega-item.pendiente::before {
-    background-color: orange;
-}
-
-.entrega-item.aprobada::before {
-    background-color: #28a745;
-}
-
-.entrega-item.rechazada::before {
-    background-color: #dc3545;
 }
 
 .entrega-info-text {
@@ -168,7 +158,8 @@ hr {
 .entrega-form {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin: 0 auto;
+    margin-bottom: 20px;
     align-items: stretch;
 }
 
@@ -241,4 +232,58 @@ hr {
     border-bottom: 2px solid #ccc;
     padding-bottom: 5px;
     margin-top: 0;
+}
+
+.btn-seleccionar-archivo {
+    background-color: #007bff;
+    color: white;
+}
+
+#mostrarMas {
+    /* Elimina todos los estilos del botón */
+    all: unset;
+    background-color: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 2px;
+}
+
+.estado-pendiente, .estado-aprobada, .estado-rechazada {
+    background-color: #f8f9fa;
+    padding: 18px 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 15px;
+    position: relative; 
+    overflow: hidden;
+}
+
+.estado-pendiente:hover, .estado-aprobada:hover, .estado-rechazada:hover {
+    border-left: 0px;
+}
+
+.estado-pendiente {
+    border-left: 5px solid #FFA040;
+}
+
+.estado-pendiente:hover {
+    border-right: 5px solid #FFA040;
+}
+
+.estado-aprobada {
+    border-left: 5px solid #28a745;
+}
+
+.estado-aprobada:hover {
+    border-right: 5px solid #28a745;
+}
+
+.estado-rechazada {
+    border-left: 5px solid #dc3545;
+}
+
+.estado-rechazada:hover {
+    border-right: 5px solid #dc3545;
 }

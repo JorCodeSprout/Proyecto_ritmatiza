@@ -147,6 +147,51 @@ class AuthController extends Controller {
     }
 
     /*
+     * Update
+     * ===============
+     * Este método será el encargado de actualizar los datos del usuario (email y contraseña). Otra función a implementar
+     * en un futuro sería la posibilidad de cambiar también su nombre, pero al ser una aplicación que se use en ámbitos
+     * estudiantiles, no se da esa opción.
+     *
+     * Devolverá los datos actualizados
+     */
+    public function update(Request $request) {
+        $user = Auth::user();
+        if(!$user) {
+            return response()->json(["error" => "Usuario no autenticado"], 401);
+        }
+
+        $validacion = Validator::make($request->all(), [
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'sometimes|string|min:6|confirmed',
+            'current_password' => 'nullable|string'
+        ]);
+
+        if($validacion->fails()) {
+            return response()->json($validacion->errors(), 422);
+        }
+
+        $dataActualizar = $request->only('email', 'password');
+
+        if($request->filled('password')) {
+            $currentPassword = $request->input("current_password");
+
+            if(!$request->filled('current_password') || !Hash::check($currentPassword, $user->password)) {
+                return response()->json(['error' => 'Contraseña actual incorrecta o faltante'], 403);
+            }
+
+            $dataActualizar['password'] =Hash::make($request->password);
+        }
+
+        if(empty($dataActualizar)) {
+            return response()->json(["message" => "No se proporcionan datos suficientes para actualizar"], 200);
+        }
+
+        $user->update($dataActualizar);
+        return response()->json($user->only(['id', 'name', 'email', 'role', 'puntos', 'profesor_id']), 200);
+    }
+
+    /*
      * RespondWithToken
      * ========================0
      * Este método se encargará de gestionar el token del usuario y el cual se utilizará en el resto de métodos.

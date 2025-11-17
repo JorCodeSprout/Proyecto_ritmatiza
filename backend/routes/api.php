@@ -30,7 +30,8 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout');
         Route::post('refresh', 'refresh');
-        Route::get('me', 'me');
+        Route::get('me', 'me');    
+        Route::put('usuario/update', 'update');
     });
 
     Route::controller(TareaController::class)->prefix('/tareas')->group(function () {
@@ -42,10 +43,13 @@ Route::middleware('auth:api')->group(function () {
         Route::get('mis-entregas', 'misEntregas');
     });
 
-    Route::controller(MusicaController::class)->prefix('musica')->group(function () {
+    Route::controller(MusicaController::class)->prefix('/musica')->group(function () {
         Route::get('playlist', 'getPlaylist');
         Route::post('sugerir', 'sugerirCancion');
         Route::get('buscar-spotify', 'buscarSpotify');
+
+        // Ruta para ver TODAS las sugerencias
+        Route::get('sugerencias', [MusicaController::class, 'listado']);
     });
 
     Route::middleware('can:profesor-or-admin')->group(function () {
@@ -59,24 +63,22 @@ Route::middleware('auth:api')->group(function () {
         
         // Calificar tarea
         Route::post('entregas/{entrega}/calificar', [TareaController::class, 'calificarEntrega']);
-
-        // Ruta para ver TODAS las sugerencias
-        Route::get('musica/sugerencias', [MusicaController::class, 'listado']);
     });
 
     Route::middleware('can:admin-only')->group(function () {
-        Route::controller(SpotifyAuthController::class)->prefix('spotify')->group(function () {
+        Route::controller(SpotifyAuthController::class)->prefix('/spotify')->group(function () {
             Route::post('redirect', 'redirect');
         });
 
-        // Administracion de Playlist:
-        // 1. Aceptar Sugerencia (Añadir a playlist)
-        Route::post('musica/playlist/add', [MusicaController::class, 'anadirPlaylist']);
+        Route::controller(SpotifyAuthController::class)->prefix('/musica')->group(function () {
+            // 1. Aceptar Sugerencia (Añadir a playlist)
+            Route::post('playlist/add', [MusicaController::class, 'anadirPlaylist']);
 
-        // 2. Eliminar cancion de playlist (Eliminacion fisica)
-        Route::delete('musica/playlist/eliminar', [MusicaController::class, 'eliminarCancionPlaylist']);
+            // 2. Eliminar cancion de playlist (Eliminacion fisica)
+            Route::delete('playlist/eliminar', [MusicaController::class, 'eliminarCancionPlaylist']);
 
-        // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
-        Route::post('musica/sugerencias/cancelar', [MusicaController::class, 'cancelarCancion']);
+            // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
+            Route::post('sugerencias/cancelar', [MusicaController::class, 'cancelarCancion']);
+        });
     });
 });

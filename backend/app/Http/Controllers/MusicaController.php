@@ -13,10 +13,13 @@ namespace App\Http\Controllers;
 use App\Models\CancionPlaylist;
 use App\Models\Sugerencia;
 use App\Services\SpotifyApiService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class MusicaController extends Controller {
@@ -75,15 +78,13 @@ class MusicaController extends Controller {
      *          En este caso se te mostrarán solo las sugerencias que has realizado tú
      */
     public function listado() {
-        if(Gate::allows('profesor-or-admin')) {
-            $sugerencias = Sugerencia::with('sugerencia_por_id')
-                ->where('estado', 'PENDIENTE')
-                ->get();
-        }
-
-        $sugerencias = Sugerencia::with('sugerencia_por_id')
-            ->where('sugerencia_por_id', Auth::id())
-            ->get();
+        Gate::allows('profesor-or-admin')
+            ? $sugerencias = Sugerencia::with('sugerencia_por_id')
+                    ->where('estado', 'PENDIENTE')
+                    ->get()
+            : $sugerencias = Sugerencia::with('sugerencia_por_id')
+                    ->where('sugerencia_por_id', Auth::id())
+                    ->get();
 
         return response()->json($sugerencias);
     }
@@ -183,21 +184,41 @@ class MusicaController extends Controller {
      * buscarSpotify
      * ===================
      * Este método será el encargado de interactuar con la API, el cual recibe una solicitud (query) y con la API de Spotify
-     * mostrará los resultados que se adapten a dicha query, la cual ha de ser una canción. Como su propio nombre indica,
-     * será un buscador de canciones.
+     * mostrará los resultados que se adapten a dicha query, la cual ha de ser una canción, un artista o un album.
      */
     public function buscarSpotify(Request $request) {
         $validado = Validator::make($request->all(), [
-            'query' => 'required|string|min:3',
+            'query' => 'required|string|min:3'
         ]);
 
-        if($validado->fails()) {
+        if($validado->failed()) {
             return response()->json($validado->errors(), 422);
         }
 
-        return response()->json([
-            'message' => 'Funcionalidad de búsqueda simulada. Se require un token real.',
-            'query' => $request->query,
-        ]);
+        $token = $this->spotifyApiService->getClientCredentialsToken();
+
+        if(!$token) {
+            return response()->json(['error' => 'No se ha podido obtener el token de autorización de Spotify'], 503);
+        }
+
+        try {
+            $response = Http::withToken($token)->get('https://api.spotify.com/v1/search', [
+                'q' => $request->query,
+                'type' => 'artist,album,track',
+                'limit' => 10
+            ]);
+
+            if($response->successful()) {
+                return response()->json($response->json());
+            }
+
+            return response()->json([
+                'error' => 'Ha habido un problema en la búsqueda',
+                'details' => $response->json()
+            ], $response->getStatusCode());
+        } catch(Exception $e) {
+            Log::error(`Error al intentar buscar en Spotify: {$e->getMessage()}`);
+            return response()->json(['error' => 'Error de conexión con Spotify'], 500);
+        }
     }
 }

@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
-import '../assets/styles/home.css';
+import '../assets/styles/Home.css';
+import '../assets/styles/Tareas.css';
 import type { SongItem, Tarea } from '../types';
 import Tareas from '../components/Tareas';
+import TareaCard from '../components/TareaCard';
 
 const mainContentStyles: React.CSSProperties = {
     display: 'flex',
@@ -256,12 +258,10 @@ const Home: React.FC = () => {
                             )}
 
                             {!isLoadingTareas && !errorTareas && ultimasTareas.map((tarea) => (
-                                <div key={tarea.id} className='task-item-container task-card card-base'>
-                                    <div className='task-info'>
-                                    <h3>{tarea.titulo}</h3>
-                                    <p>{tarea.descripcion}</p>
+                                <div key={tarea.id}>
+                                    <div>
+                                        <TareaCard tarea={tarea} />
                                     </div>
-                                    <p className='task-reward'>Puntos: {tarea.recompensa}</p>
                                 </div>
                             ))}
                         </div>

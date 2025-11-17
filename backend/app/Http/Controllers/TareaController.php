@@ -18,7 +18,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class TareaController extends Controller {
     public function __construct() {
@@ -68,6 +70,7 @@ class TareaController extends Controller {
             'descripcion' => $request->descripcion,
             'recompensa' => $request->recompensa,
             'creador_id' => Auth::id(),
+            'reenviar' => $request->reenviar ?? false
         ]);
 
         return response()->json(['message' => 'Tarea creada exitosamente.', 'tarea' => $tarea], 200);
@@ -78,20 +81,35 @@ class TareaController extends Controller {
      * ======================
      * Este método será el encargado de guardar el archivo en la base de datos. Por defecto, cuando entregas la tarea ésta
      * pasa a tener un estado PENDIENTE y éste se mantendrá hasta que algún profesor o admin la corrija.
-     * La ruta debe ser una cadena de no más de 500 caracteres. Si pasa la validación y la entrega se crea de forma correcta,
+     * La ruta debe ser un archivo File. Si pasa la validación y la entrega se crea de forma correcta,
      * se mostrará un mensaje de confirmación. En el caso de que la validación falle, se mostrará un mensaje 422.
+     * 
+     * Una vez que se muestra el mensaje de confirmación, podremos encontrar el archivo en ritmatiza/backend/storage/app/public/uploads/entregas.
      */
     public function subirEntrega(Request $request, Tarea $tarea) {
         $validador = Validator::make($request->all(), [
-            'ruta' => 'required|string|max:500',
+            'ruta' => 'required|file|max:10240',
         ]);
 
         if($validador->fails()) {
             return response()->json($validador->errors(), 422);
         }
 
+        $archivo = $request->file('ruta');
+        $nombreArchivo = $archivo->getClientOriginalName();
+        $extension = $archivo->getClientOriginalExtension();
+        $nombre = time() . '_' . Str::random(10) . '.' . $extension;
+
+        $ruta = 'uploads/entregas';
+
+        if(!Storage::disk('public')->exists($ruta)) {
+            Storage::disk('public')->makeDirectory('$ruta');
+        }
+
+        $rutaAlmacenada = $archivo->storeAs($ruta, $nombre, 'public');
+
         $entrega = Entrega::create([
-            'ruta' => $request->ruta,
+            'ruta' => $rutaAlmacenada,
             'tarea_id' => $tarea->id,
             'estudiante_id' => Auth::id(),
             'estado' => 'PENDIENTE',

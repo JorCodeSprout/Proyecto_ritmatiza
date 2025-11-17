@@ -1,4 +1,4 @@
-:: start.bat - Script de inicio para Docker Compose y Vite
+:: Script de inicio para Docker Compose y Vite
 @echo off
 setlocal
 
@@ -6,8 +6,20 @@ setlocal
 echo.
 echo Levantando contenedores Docker (ritmatiza_app, ritmatiza_web, ritmatiza_db)...
 docker compose up -d
+echo Esperando a que el contenedor PHP se inicialice...
+timeout /t 5 /nobreak >nul
 
-:: 2. Iniciar el servidor de desarrollo de Vite
+:: 2. Establecer permisos de escritura en las carpetas de almacenamiento
+echo Ajustando permisos de la carpeta 'storage' en el contenedor...
+docker compose exec app chmod -R 777 /var/www/html/storage
+docker compose exec app chmod -R 777 /var/www/html/bootstrap/cache
+echo Permisos ajustados.
+
+:: 3. Crear enlace simbólico para que los archivos subidos sean accesibles
+echo Creando enlace simbólico para storage...
+docker compose exec app php artisan storage:link
+
+:: 4. Iniciar el servidor de desarrollo de Vite
 echo.
 echo Iniciando Vite Dev Server en ./frontend (Ctrl + C para detener)
 echo.

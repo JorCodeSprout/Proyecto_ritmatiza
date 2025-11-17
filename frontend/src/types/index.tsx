@@ -1,5 +1,6 @@
 export type EstadoSugerencia = "APROBADA" | "SUSPENDIDA" | "PENDIENTE";
 export type EstadoEntrega = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
+export type EstadoSolicitud = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 
 
 export interface User {
@@ -9,6 +10,13 @@ export interface User {
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
     puntos: number;
     profesor_id: number | null;
+}
+
+export interface UsuarioActualizado {
+    email?: string;
+    current_password?: string;
+    password?: string;
+    password_confirmacion?: string;
 }
 
 
@@ -35,6 +43,7 @@ export interface Tarea {
     creador_id: number | null;
     estado_entrega?: EstadoEntrega;
     entrega_id?: number | null;
+    reenviar: boolean;
 }
 
 export interface SongItem {
@@ -62,4 +71,38 @@ export interface Entrega {
     tarea_id:  number;
     tarea_titulo: string;
     tarea_recompensa: number;
+}
+
+export interface SugerenciasCanciones {
+    id: number;
+    id_spotify_cancion: string;
+    artista: string;
+    titulo: string;
+    sugerencia_por_id?: number;
+    estado: EstadoSolicitud;
+}
+
+export interface SubidaArchivosProps {
+    tarea_id: number;
+    entregaSuccess: () => Promise<void>;
+    reenviar: boolean;
+}
+
+export interface PanelEstudiante {
+    puntos: number | null;
+    profesor_id: number | null;
+    tareasDisponibles: Tarea[];
+    misEntregas: Entrega[];
+    reloadEntregas: () => Promise<void>;
+}
+
+export interface PanelProfesor {
+    tareasDisponibles: Tarea[];
+    entregas: Entrega[];
+    handleCrearTarea: () => void;
+    handleCalificar: (entrega_id: number, estado: "APROBADA" | "RECHAZADA") => Promise<void>;
+}
+
+export interface PanelNoLogueado {
+    tareasDisponibles: Tarea[];
 }
