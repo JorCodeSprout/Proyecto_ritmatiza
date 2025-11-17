@@ -8,7 +8,7 @@ import ContactoPage from "./pages/ContactoPage";
 import TareasPage from "./pages/TareasPage";
 import CrearTareasPage from "./pages/CrearTareasPage.tsx";
 import MusicPage from "./pages/MusicPage.tsx";
-import Perfil from "./pages/Perfil.tsx";
+// import Perfil from "./pages/Perfil.tsx";
 
 export default function App() {
   return (
@@ -23,7 +23,7 @@ export default function App() {
           <Route path="/tareas" element={<TareasPage/>} />
           <Route path="/tareas/crear" element={<CrearTareasPage/>} />
           <Route path="/musica" element={<MusicPage/>} />
-          <Route path="/perfil" element={<Perfil />} />
+          {/* <Route path="/perfil" element={<Perfil />} /> */}
         </Routes>
       </Router>
     </AuthProvider>

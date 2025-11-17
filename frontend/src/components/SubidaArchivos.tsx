@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import type { SubidaArchivosProps } from "../types";
-import { enviarEntrega } from "../api/tareas";
+import { fetchEnviarEntrega } from "../api/tareas";
 
 const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess, reenviar}) => {
     const {token} = useAuth();
@@ -30,7 +30,7 @@ const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess
         setLoading(true);
 
         try {
-            await enviarEntrega(tarea_id, archivoASubir, token);
+            await fetchEnviarEntrega(tarea_id, archivoASubir, token);
 
             alert("Entrega subida. Pendiente de calificación");
             setNombreArchivo(null);
