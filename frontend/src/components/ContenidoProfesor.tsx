@@ -1,62 +1,28 @@
 import type React from "react";
 import type { PanelProfesor } from "../types";
+import styles from "../assets/styles/Tareas.module.css"
 
-const ContenidoAdminProfesor: React.FC<PanelProfesor> = ({tareasDisponibles, entregas, handleCrearTarea, handleCalificar}) => {
-    const entregasPendientes = entregas.filter(entrega => entrega.estado === "PENDIENTE");
-
+const ContenidoAdminProfesor: React.FC<PanelProfesor> = ({tareasDisponibles, handleCrearTarea}) => {
     return (
-        <>
+        <div className={styles.tareas}>
+            <h1>Gestión de Tareas</h1>
+
             <h2>Panel de PROFESOR</h2>
             <hr />
-            <div className="acciones-profesor">
-                <button onClick={handleCrearTarea} className="btn-crear">
+            <div id={styles.div_btn}>
+                <button onClick={handleCrearTarea} className={styles.btn_crear}>
                     ➕ Crear nueva tarea
                 </button>
             </div>
-
-            <div className="seccion-entregas-corregir">
-                <h3>Entregas pendientes de calificar</h3>
-                {entregasPendientes.length > 0
-                    ? (
-                        <div className="lista-entregas">
-                            {entregasPendientes.map(entrega => (
-                                <div key={entrega.id} className={`enterga-item estado-${entrega.estado.toLowerCase()}`}>
-                                    <h4>Tarea: {entrega.tarea_titulo}</h4>
-                                    <p>
-                                        <strong>Estudiante ID:</strong> {entrega.estudiante_id}
-                                    </p>
-                                    <p>
-                                        <strong>Archivo:</strong> {entrega.ruta}
-                                    </p>
-                                    <p style={{color: 
-                                        entrega.estado === "PENDIENTE" ? "orange"
-                                        : entrega.estado === "APROBADA" ? "green"
-                                        : "red"
-                                    }}>
-                                        <strong style={{color: "black"}}>Estado:</strong> {entrega.estado}
-                                    </p>
-                                    <div className="acciones-calificacion">
-                                        <button onClick={() => handleCalificar(entrega.id, "APROBADA")} className="btn-aprobar">✅ Aprobar</button>
-                                        <button onClick={() => handleCalificar(entrega.id, "RECHAZADA")} className="btn-suspender">❌ Suspender</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )
-                    : (
-                        <p>No hay entregas pendientes para calificar.</p>
-                    )
-                }
-            </div>
-            <hr />
-            <div className="seccion-tareas-creadas">
-                <h3>Tareas disponibles actualmente</h3>
+            <div className={styles.seccion_tareas_creadas}>
+                <h3>Ultimas tareas creadas</h3>
                 {tareasDisponibles.length > 0 
                     ? (
-                        <div className="lista-tareas">
+                        <div className={styles.lista_tareas}>
                             {tareasDisponibles.map(tarea => (
-                                <div key={tarea.id} className="tarea-card">
+                                <div key={tarea.id} className={styles.tarea_card}>
                                     <h4>{tarea.titulo}</h4>
+                                    <p>Descripción: {tarea.descripcion}</p>
                                     <p>Puntos: {tarea.recompensa} 🌟</p>
                                 </div>
                             ))}
@@ -67,7 +33,7 @@ const ContenidoAdminProfesor: React.FC<PanelProfesor> = ({tareasDisponibles, ent
                     )
                 }
             </div>
-        </>
+        </div>
     );
 }
 

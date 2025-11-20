@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import '../assets/styles/formulario_inicio.css'
 
 const URL = import.meta.env.VITE_API_URL;
 const EMAIL_API_URL = `${URL}/contacto`;
 const Contacto = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const {user} = useAuth();
+
+    const [name, setName] = useState(user?.name ?? '');
+    const [email, setEmail] = useState(user?.email ?? '');
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
     
@@ -72,7 +76,7 @@ const Contacto = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 font-[Inter]">
+        <div className={`${user ? 'logged-contact-form' : 'noLogged'}`}>
             <form onSubmit={handleSubmit} className="contact-form">
                 <h2>Contáctanos</h2>
                 <p className='description'>
@@ -139,7 +143,7 @@ const Contacto = () => {
 
                 <button 
                     type="submit" 
-                    className='submit-btn' 
+                    id="iniciar"
                     disabled={loading}
                 >
                     {loading ? 'Enviando...' : 'Enviar mensaje'}

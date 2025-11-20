@@ -1,13 +1,24 @@
 import React from 'react';
-import Layout from '../components/Layout';
-import '../assets/styles/formulario_inicio.css'
 import Contacto from '../components/Contacto';
+import { useAuth } from '../hooks/useAuth';
+import Sidebar from '../components/Sidebar';
+import Layout from '../components/Layout';
 
 const ContactoPage: React.FC = () => {
+    const {isLogged} = useAuth();
     return (
-        <Layout>
-            <Contacto />
-        </Layout>
+        isLogged ? (
+            <>
+                <Sidebar />
+                <div id="body">
+                    <Contacto />
+                </div>
+            </>
+        ) : (
+            <Layout>
+                <Contacto/>
+            </Layout>
+        )
     );
 }
 

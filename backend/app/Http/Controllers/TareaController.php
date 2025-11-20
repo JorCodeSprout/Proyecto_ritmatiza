@@ -14,6 +14,9 @@ namespace App\Http\Controllers;
 use App\Models\Entrega;
 use App\Models\Tarea;
 use App\Models\User;
+use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +61,7 @@ class TareaController extends Controller {
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'recompensa' => 'required|integer|min:1',
+            'fecha' => 'required|date|after_or_equal:tomorrow',
             'reenviar' => 'boolean',
         ]);
 
@@ -65,11 +69,14 @@ class TareaController extends Controller {
             return response()->json($validado->errors(), 422);
         }
 
+        $fecha = Carbon::createFromFormat('Y-m-d', $request->fecha, 'Europe/Madrid');
+
         $tarea = Tarea::create([
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
             'recompensa' => $request->recompensa,
             'creador_id' => Auth::id(),
+            'fecha' => $fecha,
             'reenviar' => $request->reenviar ?? false
         ]);
 
@@ -96,9 +103,8 @@ class TareaController extends Controller {
         }
 
         $archivo = $request->file('ruta');
-        $nombreArchivo = $archivo->getClientOriginalName();
         $extension = $archivo->getClientOriginalExtension();
-        $nombre = time() . '_' . Str::random(10) . '.' . $extension;
+        $nombre = time() . '_' . Str::random(8) . '.' . $extension;
 
         $ruta = 'uploads/entregas';
 
@@ -174,8 +180,8 @@ class TareaController extends Controller {
      * EntregasPorTarea
      * ============================
      * En este caso es obligatorio ser admin o profesor y en caso de no serlo se te mostrará un mensaje de error de
-     * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes. La devolución
-     * de este método consiste en un objeto JSON con todas las entregas.
+     * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes y 
+     * que aun no hayan sido corregidas. La devolución de este método consiste en un objeto JSON con todas las entregas.
      */
     public function entregasPorTarea($creador_id) {
         if(Gate::denies('profesor-or-admin')) {
@@ -184,6 +190,7 @@ class TareaController extends Controller {
         
         $entregas = Entrega::join('tareas', 'entregas.tarea_id', '=', 'tareas.id')
             ->where('tareas.creador_id', $creador_id)
+            ->where('entregas.estado', 'PENDIENTE')
             ->select('entregas.*', 'tareas.titulo as tarea_titulo', 'tareas.recompensa as tarea_recompensa')
             ->get();
             

@@ -1,19 +1,35 @@
-import {useAuth} from "../hooks/useAuth.ts";
+/*Fallo de servidor (405). Respuesta: <!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8" /> <meta name="viewport" conte..*/
+
+import {useAuth} from "../hooks/useAuth";
 import {useState} from "react";
 import type { NuevaTarea } from "../types/index.tsx";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const CrearTarea: React.FC = () => {
     const {role, token} = useAuth();
 
+    const getFechaManana = (): string => {
+        const today = new Date();
+        const tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+        
+        const year = tomorrow.getFullYear();
+        const month = (tomorrow.getMonth() + 1).toString().padStart(2, '0');
+        const day = tomorrow.getDate().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    };
+
     const [tareaData, setTareaData] = useState<NuevaTarea>({
         titulo: '',
         descripcion: '',
         recompensa: 10,
+        fecha: getFechaManana(),
         reenviar: false,
     });
 
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string |null>(null);
@@ -52,7 +68,7 @@ const CrearTarea: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(API_URL + "/tareas/crear", {
+            const response = await fetch(`${API_URL}/tareas/crear`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +96,7 @@ const CrearTarea: React.FC = () => {
             const result = await response.json();
 
             setSuccess(`Tarea ${result.tarea.titulo}, creada con éxito.`);
-            setTareaData({titulo: '', descripcion: '', recompensa: 10, reenviar: false});
+            setTareaData({titulo: '', descripcion: '', recompensa: 10, fecha: getFechaManana(), reenviar: false});
         } catch (error) {
             console.error("Error en el envío del formulario.", error);
             setError(error instanceof Error ? error.message : 'Error desconocido al crear la tarea.');
@@ -105,6 +121,13 @@ const CrearTarea: React.FC = () => {
             {success && <p className="success-message">{success}</p>}
 
             <form onSubmit={handleSubmit} className="form-crear-tarea">
+                <button 
+                    className="return-button" 
+                    onClick={() => navigate('/')}
+                    title="Volver a la lista de tareas"
+                >
+                    ❌
+                </button>
                 <h2>Crear Nueva Tarea</h2>
 
                 <div className="input-container">
@@ -148,6 +171,20 @@ const CrearTarea: React.FC = () => {
                         disabled={loading}
                     />
                     <label htmlFor="recompensa">Recompensa (Puntos 🎵)</label>
+                </div>
+
+                <div className="input-container">
+                    <input 
+                        type="date" 
+                        name="fecha" 
+                        id="fecha" 
+                        placeholder=" " 
+                        value={tareaData.fecha} 
+                        onChange={handleChange}
+                        required 
+                        disabled={loading}
+                    />
+                    <label htmlFor="fecha">Fecha de entrega</label>
                 </div>
 
                 <div className="term-container checkbox-group">

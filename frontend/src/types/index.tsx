@@ -2,7 +2,6 @@ export type EstadoSugerencia = "APROBADA" | "SUSPENDIDA" | "PENDIENTE";
 export type EstadoEntrega = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
 export type EstadoSolicitud = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 
-
 export interface User {
     id: number;
     email: string;
@@ -16,9 +15,19 @@ export interface UsuarioActualizado {
     email?: string;
     current_password?: string;
     password?: string;
-    password_confirmacion?: string;
+    password_confirmation?: string;
 }
 
+export interface LayoutProps {
+    children: React.ReactNode;
+    includeFooter?: boolean;
+}
+
+export interface MenuItem {
+    id: string;
+    name: string;
+    href: string;
+}
 
 export interface LoginFormProps {
     onLoginSuccess: (token: string, user: User) => void; 
@@ -32,6 +41,7 @@ export interface NuevaTarea {
     titulo: string;
     descripcion: string;
     recompensa: number;
+    fecha: string;
     reenviar: boolean;
 }
 
@@ -88,6 +98,15 @@ export interface SubidaArchivosProps {
     reenviar: boolean;
 }
 
+export interface EntregasProps {
+    misEntregas: Entrega[];
+}
+
+export interface EntregasProfProps {
+    entregasPendientes: Entrega[];
+    handleCalificar: (id: number, estado: "APROBADA" | "RECHAZADA") => void;
+} 
+
 export interface PanelEstudiante {
     puntos: number | null;
     profesor_id: number | null;
@@ -105,4 +124,9 @@ export interface PanelProfesor {
 
 export interface PanelNoLogueado {
     tareasDisponibles: Tarea[];
+}
+
+export interface ActualizarPropForm {
+    setError: (message: string | null) => void;
+    setSuccess: (message: string | null) => void;
 }

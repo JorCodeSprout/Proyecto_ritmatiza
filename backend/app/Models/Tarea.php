@@ -11,6 +11,7 @@
  * descripción --> breve descripción de en qué consiste la tarea
  * recompensa --> cantidad de puntos que conseguirás si apruebas la tarea
  * creador_id --> FK User (Profesor) que ha creado la tarea
+ * fecha --> Fecha en la que tiene que ser entregada la tarea
  * reenviar --> boolean que da la opción de poder realizar más de una entrega para una misma tarea
  */
 
@@ -29,6 +30,7 @@ class Tarea extends Model {
         'descripcion',
         'recompensa',
         'creador_id',
+        'fecha',
         'reenviar',
     ];
 

@@ -1,4 +1,5 @@
 form {
+    position: relative;
     margin: 20px;
     padding: 20px 30px;
     border-radius: 12px;
@@ -155,4 +156,26 @@ textarea {
 .success-message {
     background-color: #d1fae5;
     color: #10b981;
+}
+
+.return-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10; 
+    padding: 8px 15px;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+button[type="submit"] {
+    background-color: #FADA5F;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }

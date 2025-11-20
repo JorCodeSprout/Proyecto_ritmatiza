@@ -139,7 +139,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
 
             <button
                 type="submit"
-                className='registro'
+                id='registro'
                 disabled={loading}
             >
                 {loading ? 'Registrando...' : 'Registrarse'}
@@ -149,7 +149,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
 
             <button
                 type="button"
-                className='iniciar'
+                id='iniciar'
                 onClick={() => navigate('/login')}
                 disabled={loading}
             >

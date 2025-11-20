@@ -1,12 +1,7 @@
 import React from 'react';
 import Header from './Header'; 
 import Footer from './Footer'; 
-import '../assets/styles/general.css';
-
-interface LayoutProps {
-    children: React.ReactNode;
-    includeFooter?: boolean;
-}
+import type { LayoutProps } from '../types';
 
 const Layout: React.FC<LayoutProps> = ({ children, includeFooter = true }) => {
     return (

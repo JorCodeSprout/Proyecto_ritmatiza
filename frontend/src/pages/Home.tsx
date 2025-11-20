@@ -3,15 +3,15 @@ import Layout from '../components/Layout';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import '../assets/styles/Home.css';
-import '../assets/styles/Tareas.css';
 import type { SongItem, Tarea } from '../types';
 import Tareas from '../components/Tareas';
 import TareaCard from '../components/TareaCard';
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
 const mainContentStyles: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    width: '100%',
     minHeight: '90%'
 }
 
@@ -278,32 +278,39 @@ const Home: React.FC = () => {
 
     if (profesor_admin) {
         return (
-            <Layout>
-                <div className='mainContentStyles logged-in-layout'>
-                    <div className='grid-container-profesor'>
-                        <div className='grid-item bloque-header-profesor'>
-                            <h1>{bienvenido}</h1>
-                            <p>Gestión y administración de la plataforma.</p>
-                            <Tareas />
+            <>
+                <Sidebar />
+                <div id="body">
+                    <div className='mainContentStyles logged-in-layout'>
+                        <div className='grid-container-profesor'>
+                            <div className='grid-item bloque-logged'>
+                                <h1 className='titulo'>{bienvenido}</h1>
+                                <p>Gestión y administración de la plataforma.</p>
+                                <Tareas />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </Layout>
+            </>
         );
     }
 
     return (
-        <Layout>
-            <div className='mainContentStyles logged-in-layout'>
-                <div className='grid-container-estudiante'>
-                    <div className='grid-item bloque-header-izq'>
-                    <h1>{bienvenido}</h1>
-                    </div>
+        <>
+            <Sidebar />
+            <div id="body">
+                <div className='mainContentStyles logged-in-layout'>
+                    <div className='grid-container-estudiante'>
+                        <div className='grid-item bloque-logged'>
+                        <h1 className='titulo'>{bienvenido}</h1>
+                        </div>
 
-                    <Tareas />
+                        <Tareas />
+                    </div>
                 </div>
             </div>
-        </Layout>
+            <Footer />
+        </>
     );
 }
 

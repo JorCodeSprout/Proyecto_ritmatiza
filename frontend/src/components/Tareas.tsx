@@ -19,6 +19,7 @@ import { fetchCalificar, fetchMisEntregas, fetchTareasByProfesor, fetchTodasEntr
 import ContenidoNoLogueado from "./ContenidoNoLogueado";
 import ContendioEstudiante from "./ContenidoEstudiante";
 import ContenidoAdminProfesor from "./ContenidoProfesor";
+import styles from '../assets/styles/Tareas.module.css'
 
 const Tareas: React.FC = () => {
     const {isLogged, role, puntos, profesorId, id, token} = useAuth();
@@ -111,7 +112,7 @@ const Tareas: React.FC = () => {
 
     const contenidoSegunRole = () => {
         if(loading) {
-            return <p>Cargando información de tareas y entregas...</p>
+            return <p className={styles.cargando}>Cargando información de las tareas...</p>
         }
 
         if(!isLogged) {
@@ -130,9 +131,7 @@ const Tareas: React.FC = () => {
     }
 
     return (
-        <div className="tareas-container">
-            <h1>Gestión de Tareas</h1>
-            <hr />
+        <div className={styles.tareas_container}>
             {contenidoSegunRole()}
         </div>
     );

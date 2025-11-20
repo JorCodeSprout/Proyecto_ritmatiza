@@ -1,24 +1,16 @@
 import '../assets/styles/formulario_tareas.css';
 import React from "react";
-import Layout from "../components/Layout.tsx";
 import CrearTarea from "../components/CrearTarea.tsx";
-
-const mainContentStyles: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    flexGrow: 1,
-};
-
+import Sidebar from '../components/Sidebar.tsx';
 
 const CrearTareasPage: React.FC = () => {
     return (
-        <Layout>
-            <div style={mainContentStyles}>
-                <CrearTarea/>
+        <>
+            <Sidebar />
+            <div id="body">
+                <CrearTarea />    
             </div>
-        </Layout>
+        </>
     )
 }
 

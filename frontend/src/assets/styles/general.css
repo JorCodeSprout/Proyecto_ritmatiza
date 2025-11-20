@@ -10,6 +10,8 @@ html {
 
 #body {
     width: 100dvw;
+    overflow-y: hidden;
+    overflow: hidden;
     margin: 0px;
     padding: 0 20px;
     box-sizing: border-box;
@@ -24,7 +26,6 @@ html {
 header {
     text-align: center;
     border-bottom: 2px solid #c5defa;
-    max-width: 1200px;
     padding: 2px 0;
     display: flex;
     justify-content: space-between;
@@ -73,20 +74,27 @@ nav.menu ul li a {
     border: none;
     cursor: pointer;
     border-radius: 10px;
-    transition: transform 0.1s ease;
 }
 
-button:hover {
-    transform: scale(1.05);
+#iniciar_sesion {
+    background-color: #FADA5F;
+    color: #007bff;
 }
 
-.iniciar {
-    background-color: #007bff;
-    color: white;
+#iniciar_sesion:hover {
+    transform: scale(1);
+    background-color: #FFF7DB;
+    color: #007bff;
 }
 
-.registro {
-    background-color: #c5defa;
+.registro_sesion {
+    background-color: #FFF7DB;
+    color: #007bff;
+}
+
+.registro_sesion:hover {
+    transform: scale(1);
+    background-color: #FADA5F;
     color: #007bff;
 }
 
@@ -122,8 +130,6 @@ footer p {
     font-size: 0.8rem;
 }
 
-nav.menu ul li a.marcado {
-    color: #007bff;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 5px;
+button:hover {
+    transform: scale(1);
 }

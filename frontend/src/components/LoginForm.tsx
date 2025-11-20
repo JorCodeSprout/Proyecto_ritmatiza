@@ -88,7 +88,7 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess}) => {
 
             <button 
                 type="submit" 
-                className='iniciar' 
+                id='iniciar' 
                 disabled={loading}
             >
                 {loading ? 'Iniciando...' : 'Iniciar sesión'}

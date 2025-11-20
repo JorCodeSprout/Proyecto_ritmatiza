@@ -2,6 +2,14 @@
     color: #213547;
 }
 
+.bloque-logged {
+    margin-left: 300px;
+}
+
+h1 {
+    overflow-y: hidden;
+}
+
 .card-base {
     background-color: white;
     border-radius: 6px;

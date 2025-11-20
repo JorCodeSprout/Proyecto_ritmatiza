@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AuthContext, type AuthContextType } from "./AuthTypes.ts"; 
+import { AuthContext, type AuthContextType, type User } from "./AuthTypes.ts"; 
 
 const initialAuthState: Omit<AuthContextType, 'login' | 'logout' | 'setUserData'> = {
+    user: null,
     id: null,
     email: null,
     userName: null,
@@ -23,13 +24,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 const storedData = localStorage.getItem(storageKey);
                 if (storedData) {
-                    const { token, ...userData } = JSON.parse(storedData);
+                    const parsedData = JSON.parse(storedData);
                     
-                    if (token) {
+                    if (parsedData.token) {
                         setAuthState(prev => ({
                             ...prev,
-                            ...userData,
-                            token,
+                            ...parsedData,
                             isLogged: true,
                         }));
                     }
@@ -80,17 +80,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ...prev, 
                 ...newUserData,
                 role: newUserData.role !== undefined ? newUserData.role : prev.role,
+                puntos: newUserData.puntos !== undefined ? newUserData.puntos : prev.puntos
             };
 
-            const { ...dataToStore } = newState; 
+            const dataToStore = {
+                id: newState.id,
+                email: newState.email,
+                userName: newState.userName,
+                role: newState.role,
+                puntos: newState.puntos,
+                profesorId: newState.profesorId,
+                token: newState.token
+            }; 
             localStorage.setItem(storageKey, JSON.stringify(dataToStore));
             
             return newState;
         });
     };
 
+    const currentUser: User | null = authState.isLogged && authState.id !== null && authState.email !== null 
+        ? {
+            id: authState.id,
+            name: authState.userName || '',
+            email: authState.email,
+            role: (authState.role as User['role']) || 'ESTUDIANTE',
+            puntos: authState.puntos,
+            profesor_id: authState.profesorId,
+        }
+        : null;
+
     const contextValue: AuthContextType = {
         ...authState,
+        user: currentUser,
         login,
         logout,
         setUserData,

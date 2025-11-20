@@ -5,10 +5,11 @@ import { AuthProvider } from "./contexts/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import AcercaDePage from "./pages/AcercaDePage";
 import ContactoPage from "./pages/ContactoPage";
-import TareasPage from "./pages/TareasPage";
 import CrearTareasPage from "./pages/CrearTareasPage.tsx";
 import MusicPage from "./pages/MusicPage.tsx";
-// import Perfil from "./pages/Perfil.tsx";
+import DatosPersonales from "./pages/DatosPersonales.tsx";
+import Perfil from "./pages/Perfil.tsx";
+import EntregasPage from "./pages/EntregasPage.tsx";
 
 export default function App() {
   return (
@@ -20,10 +21,11 @@ export default function App() {
           <Route path="/register" element={<RegisterPage/>} />
           <Route path="/acerca" element={<AcercaDePage/>} />
           <Route path="/contacto" element={<ContactoPage/>} />
-          <Route path="/tareas" element={<TareasPage/>} />
           <Route path="/tareas/crear" element={<CrearTareasPage/>} />
           <Route path="/musica" element={<MusicPage/>} />
-          {/* <Route path="/perfil" element={<Perfil />} /> */}
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/datosPersonales" element={<DatosPersonales />} />
+          <Route path="/entregas" element={<EntregasPage />} />
         </Routes>
       </Router>
     </AuthProvider>

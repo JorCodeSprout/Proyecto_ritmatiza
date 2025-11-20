@@ -5,11 +5,13 @@ export interface User {
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN' | '';
-    puntos: number;
+    puntos: number | null;
     profesor_id: number | null; 
 }
 
 export interface AuthContextType {
+    user: User | null;
+    
     id: User['id'];
     email: User['email'] | null;
     userName: User['name'] | null;

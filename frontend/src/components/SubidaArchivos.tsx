@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import type { SubidaArchivosProps } from "../types";
 import { fetchEnviarEntrega } from "../api/tareas";
+import styles from '../assets/styles/Tareas.module.css';
 
 const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess, reenviar}) => {
     const {token} = useAuth();
@@ -52,7 +53,7 @@ const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess
 
     if(!reenviar) {
         return (
-            <div className="entrega-form-disabled">
+            <div className={styles.entrega_form_disabled}>
                 <p style={{color: "red", fontWeight: "bold"}}>
                     Ya has enviado una entrega para esta tarea. No se permite reenviar o modificar.
                 </p>
@@ -61,7 +62,7 @@ const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess
     }
 
     return (
-        <form onSubmit={handleSubmit} className="entrega-form">
+        <form onSubmit={handleSubmit} className={styles.entrega_form}>
             <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -75,14 +76,14 @@ const SubidaArchivos: React.FC<SubidaArchivosProps> = ({tarea_id, entregaSuccess
                 type="button" 
                 onClick={handleButtonClick} 
                 disabled={loading}
-                className="btn-seleccionar-archivo"
+                className={styles.btn_seleccionar_archivo}
             >
                 {nombreArchivo ? `Cambiar Archivo: ${nombreArchivo}` : "Seleccionar Archivo"}
             </button>
 
-            {nombreArchivo && <p className="archivo-seleccionado">Archivo: {nombreArchivo}</p>}
+            {nombreArchivo && <p className={styles.archivo_seleccionado}>Archivo: {nombreArchivo}</p>}
 
-            <button type="submit" disabled={loading}>
+            <button type="submit" className={styles.btn_subir} disabled={loading}>
                 {loading ? "Subiendo..." : "Subir entrega"}
             </button>
         </form>

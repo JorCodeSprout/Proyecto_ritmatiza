@@ -109,3 +109,37 @@ textarea {
     border-bottom: 1px solid grey;
     resize: none;
 }
+
+#iniciar {
+    background-color: #007bff;
+    color: #fff;
+}
+
+#iniciar:hover {
+    background-color: #0053AD;
+    color:#fff;
+}
+
+.registro {
+    background-color: #58A9FF;
+    color: #fff;
+}
+
+.registro:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.logged-contact-form {
+    margin-left: 300px;
+    margin-top: 50px;
+    height: 600px;
+}
+
+.noLogged {
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    min-width: 100dvw;
+    width: 100dvw;
+}

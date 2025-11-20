@@ -162,29 +162,28 @@ class AuthController extends Controller {
         }
 
         $validacion = Validator::make($request->all(), [
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'sometimes|string|min:6|confirmed',
-            'current_password' => 'nullable|string'
+            'current_password' => 'nullable|required_with:password|string'
         ]);
 
         if($validacion->fails()) {
             return response()->json($validacion->errors(), 422);
         }
 
-        $dataActualizar = $request->only('email', 'password');
+        $dataActualizar = [];
 
         if($request->filled('password')) {
             $currentPassword = $request->input("current_password");
 
-            if(!$request->filled('current_password') || !Hash::check($currentPassword, $user->password)) {
-                return response()->json(['error' => 'Contraseña actual incorrecta o faltante'], 403);
+            if(!Hash::check($currentPassword, $user->password)) {
+                return response()->json(["error" => "Contraseña actual incorrecta"], 403);
             }
 
-            $dataActualizar['password'] =Hash::make($request->password);
+            $dataActualizar['password'] = Hash::make($request->password);
         }
 
         if(empty($dataActualizar)) {
-            return response()->json(["message" => "No se proporcionan datos suficientes para actualizar"], 200);
+            return response()->json(["message" => "No se proporcionan datos suficientes para actualizar"], 422);
         }
 
         $user->update($dataActualizar);

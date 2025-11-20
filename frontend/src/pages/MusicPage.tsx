@@ -1,13 +1,14 @@
 
 import React from 'react';
-import Layout from '../components/Layout';
 import Musica from '../components/Musica';
+import Sidebar from '../components/Sidebar';
 
 const MusicPage: React.FC = () => {
     return (
-        <Layout>
+        <>
+            <Sidebar/>
             <Musica />
-        </Layout>
+        </>
     );
 }
 
