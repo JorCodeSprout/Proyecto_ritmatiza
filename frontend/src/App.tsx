@@ -10,6 +10,7 @@ import MusicPage from "./pages/MusicPage.tsx";
 import DatosPersonales from "./pages/DatosPersonales.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import EntregasPage from "./pages/EntregasPage.tsx";
+import Politica from "./pages/Politica.tsx";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/" element={<Home/>} />
           <Route path="/login" element={<LoginPage/>} />
           <Route path="/register" element={<RegisterPage/>} />
+          <Route path="/terms" element={<Politica />} />
           <Route path="/acerca" element={<AcercaDePage/>} />
           <Route path="/contacto" element={<ContactoPage/>} />
           <Route path="/tareas/crear" element={<CrearTareasPage/>} />

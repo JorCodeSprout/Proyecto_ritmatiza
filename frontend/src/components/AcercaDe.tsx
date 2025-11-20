@@ -1,18 +1,9 @@
 import React from "react";
-// Importamos los estilos para esta página
 import "../assets/styles/AcercaDe.css";
-
-const mainContentStyles: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    width: "100%",
-    minHeight: "90%",
-    padding: "20px 0",
-};
 
 const AcercaDe: React.FC = () => {
     return (
-        <div style={mainContentStyles}>
+        <div id="body">
             <div className="grid-container">
                 <div className="grid-item bloque-header-izq">
                     <img
@@ -23,7 +14,6 @@ const AcercaDe: React.FC = () => {
                     <h1>MÚSICA PARA MOTIVAR, PUNTOS PARA INSPIRAR</h1>
                 </div>
 
-                {/* Contenido de la sección "Acerca de" */}
                 <section className="about-section">
                     <h2>🎶 Armonizando el Esfuerzo y la Música 🎶</h2>
 
