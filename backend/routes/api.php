@@ -12,6 +12,7 @@ use App\Http\Controllers\MusicaController;
 use App\Http\Controllers\SpotifyAuthController;
 use App\Http\Controllers\SpotifyTokenController;
 use App\Http\Controllers\TareaController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,8 +31,12 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout');
         Route::post('refresh', 'refresh');
+    });
+
+    Route::controller(UserController::class)->group(function() {
         Route::get('me', 'me');    
         Route::put('usuario/update', 'update');
+        Route::get('usuario/profesor', 'obtenerProfesor');
     });
 
     Route::controller(TareaController::class)->prefix('/tareas')->group(function () {

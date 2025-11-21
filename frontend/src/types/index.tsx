@@ -13,9 +13,11 @@ export interface User {
 
 export interface UsuarioActualizado {
     email?: string;
-    current_password?: string;
+    email_confirmation?: string;
+    current_email?: string;
     password?: string;
     password_confirmation?: string;
+    current_password?: string;
 }
 
 export interface LayoutProps {
@@ -129,4 +131,9 @@ export interface PanelNoLogueado {
 export interface ActualizarPropForm {
     setError: (message: string | null) => void;
     setSuccess: (message: string | null) => void;
+}
+
+export interface Profesor {
+    nombre: string;
+    email: string;
 }

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import ActualizarUsuario from '../components/ActualizarPassword';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../hooks/useAuth';
+import ActualizarPassword from '../components/ActualizarPassword';
+import ActualizarEmail from '../components/ActualizarEmail';
+import MostrarProfesor from '../components/MostrarProfesor';
+import "../assets/styles/Perfil.css";
+import MostrarPuntos from '../components/MostrarPuntos';
+
 
 const DatosPersonales: React.FC = () => {
     const {user} = useAuth();
@@ -25,10 +30,28 @@ const DatosPersonales: React.FC = () => {
                 )}
 
                 {user?.role !== "ADMIN" && (
-                    <ActualizarUsuario
-                        setError={setError}
-                        setSuccess={setSuccess}
-                    />
+                    <>
+                        <div className='formularios'>
+                            <div>
+                                <ActualizarEmail setError={setError} setSuccess={setSuccess} />
+                            </div>
+
+                            <div>
+                                <ActualizarPassword setError={setError} setSuccess={setSuccess}/>
+                            </div>
+                        </div>
+                    {user?.role !== "PROFESOR" && (
+                        <div className="tarjetas">
+                            <div className='tarjeta_profesor'>
+                                <MostrarProfesor />
+                            </div>
+
+                            <div className='tarjeta_puntos'>
+                                <MostrarPuntos />
+                            </div>
+                        </div>
+                    )}
+                    </>
                 )}
             </div>
         </div>

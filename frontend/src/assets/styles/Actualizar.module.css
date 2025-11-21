@@ -1,7 +1,6 @@
-.formulario {
+#formulario1, #formulario {
     position: absolute;
     top: 30px;
-    left: 300px; 
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;

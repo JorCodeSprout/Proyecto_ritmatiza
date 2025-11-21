@@ -6,12 +6,12 @@ import { fetchActualizarDatos } from "../api/perfilEstudiante";
 import styles from '../assets/styles/Actualizar.module.css'; 
 
 const CAMPOS_VACIOS: Partial<UsuarioActualizado> = {
-    password: '',
-    current_password: '',
-    password_confirmation: ''
+    current_email: '',
+    email: '',
+    email_confirmation: ''
 };
 
-const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}) => {
+const ActualizarEmail: React.FC<ActualizarPropForm> = ({setError, setSuccess}) => {
     const {token, user} = useAuth();
 
     const [dataForm, setDataForm] = useState<Partial<UsuarioActualizado>>(CAMPOS_VACIOS);
@@ -27,7 +27,7 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
         setSuccess(null);
     }
 
-    const handleUpdatePasswordSubmit = async (e: React.FormEvent) => {
+    const handleUpdateEmailSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if(!token) {
             setError("No tienes un token de autenticación válido");
@@ -41,13 +41,13 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
         const data: UsuarioActualizado = {};
 
         if(!dataForm.current_email || !dataForm.email || !dataForm.email_confirmation) {
-            setError("Debes llenar todos los campos de contraseña");
+            setError("Debes llenar todos los campos de email");
             setLoading(false);
             return;
         }
         
         if(dataForm.email !== dataForm.email_confirmation) {
-            setError("La contraseña nueva y la confirmación no coinciden");
+            setError("El email nuevo y la confirmación no coinciden");
             setLoading(false);
             return;
         }
@@ -79,48 +79,48 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
 
     return (
         <>
-            <form onSubmit={handleUpdatePasswordSubmit} id={styles.formulario1} className={styles.formulario_password}>
-                <h2 className={styles.titulo}>Actualizar Contraseña</h2>
+            <form onSubmit={handleUpdateEmailSubmit} id={styles.formulario} className={styles.formulario_email}>
+                <h2 className={styles.titulo}>Actualizar Email</h2>
                 <div className="input-container">
                     <input 
-                        type="password" 
-                        name="current_password" 
-                        id="current_password" 
+                        type="email" 
+                        name="current_email" 
+                        id="current_email" 
                         placeholder=" " 
                         value={dataForm.current_email || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}
                     />
-                    <label htmlFor="current_password">Contraseña Actual</label>
+                    <label htmlFor="current_email">Email Actual</label>
                 </div>
 
                 <div className="input-container">
                     <input 
-                        type="password" 
-                        name="password" 
-                        id="password" 
+                        type="email" 
+                        name="email" 
+                        id="email" 
                         placeholder=" " 
                         value={dataForm.email || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}
                     />
-                    <label htmlFor="password">Nueva Contraseña</label>
+                    <label htmlFor="email">Email Nuevo</label>
                 </div>
 
                 <div className="input-container">
                     <input 
-                        type="password" 
-                        name="password_confirmation" 
-                        id="password_confirmation" 
+                        type="email" 
+                        name="email_confirmation" 
+                        id="email_confirmation" 
                         placeholder=" " 
                         value={dataForm.email_confirmation || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}
                     />
-                    <label htmlFor="password_confirmation">Confirmar contraseña</label>
+                    <label htmlFor="email_confirmation">Confirmar Email</label>
                 </div>
 
                 <button
@@ -135,4 +135,4 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
     );
 }
 
-export default ActualizarPassword;
+export default ActualizarEmail;
