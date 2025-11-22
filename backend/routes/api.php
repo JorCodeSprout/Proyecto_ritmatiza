@@ -34,7 +34,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::controller(UserController::class)->group(function() {
-        Route::get('me', 'me');    
+        Route::get('me', 'me');
         Route::put('usuario/update', 'update');
         Route::get('usuario/profesor', 'obtenerProfesor');
     });
@@ -54,7 +54,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('buscar-spotify', 'buscarSpotify');
 
         // Ruta para ver TODAS las sugerencias
-        Route::get('sugerencias', [MusicaController::class, 'listado']);
+        Route::get('sugerencias', 'listado');
     });
 
     Route::middleware('can:profesor-or-admin')->group(function () {
@@ -63,9 +63,9 @@ Route::middleware('auth:api')->group(function () {
             Route::post('crear', 'store');
             // Ver entregas
             Route::get('{profesor_id}/entregas', 'entregasPorTarea');
-            
+
         });
-        
+
         // Calificar tarea
         Route::post('entregas/{entrega}/calificar', [TareaController::class, 'calificarEntrega']);
     });
@@ -75,15 +75,20 @@ Route::middleware('auth:api')->group(function () {
             Route::post('redirect', 'redirect');
         });
 
-        Route::controller(SpotifyAuthController::class)->prefix('/musica')->group(function () {
+        Route::controller(MusicaController::class)->prefix('/musica')->group(function () {
             // 1. Aceptar Sugerencia (Añadir a playlist)
-            Route::post('playlist/add', [MusicaController::class, 'anadirPlaylist']);
+            Route::post('playlist/add', 'anadirPlaylist');
 
             // 2. Eliminar cancion de playlist (Eliminacion fisica)
-            Route::delete('playlist/eliminar', [MusicaController::class, 'eliminarCancionPlaylist']);
+            Route::delete('playlist/eliminar', 'eliminarCancionPlaylist');
 
             // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
-            Route::post('sugerencias/cancelar', [MusicaController::class, 'cancelarCancion']);
+            Route::post('sugerencias/cancelar', 'cancelarCancion');
+        });
+
+        Route::controller(UserController::class)->prefix('/usuario')->group(function () {
+            Route::post('/crear', 'crear');
+            Route::get('/profesores', 'obtenerProfesores');
         });
     });
 });

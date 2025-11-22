@@ -61,7 +61,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
             <h2>Bienvenido</h2>
             <p>Crea una nueva cuenta para poder ganar recompensas</p>
 
@@ -78,7 +78,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     required 
                     disabled={loading}
                 />
-                <label htmlFor="nombre">Nombre completo</label>
+                <label htmlFor="nombre">Nombre completo *</label>
             </div>
 
             <div className="input-container">
@@ -88,11 +88,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     id="correo" 
                     placeholder=" " 
                     value={email} 
+                    autoComplete="off" 
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
                     disabled={loading} 
                 />
-                <label htmlFor="correo">Correo corporativo</label>
+                <label htmlFor="correo">Correo corporativo *</label>
             </div>
 
             <div className="input-container">
@@ -102,11 +103,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     id="clave" 
                     placeholder=" " 
                     value={password} 
+                    autoComplete="new-password" 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
                     disabled={loading}
                 />
-                <label htmlFor="clave">Contraseña</label>
+                <label htmlFor="clave">Contraseña *</label>
             </div>
 
             <div className="input-container">
@@ -116,11 +118,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ registroExitoso }) => {
                     id="confirmacion" 
                     placeholder=" " 
                     value={passwordConfirmation} 
+                    autoComplete="new-password" 
                     onChange={(e) => setPasswordConfirmation(e.target.value)} 
                     required 
                     disabled={loading}
                 />
-                <label htmlFor="confirmacion">Confirmar contraseña</label>
+                <label htmlFor="confirmacion">Confirmar contraseña *</label>
             </div>
 
             <div className="term-container">

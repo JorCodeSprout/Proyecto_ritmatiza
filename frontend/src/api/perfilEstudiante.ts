@@ -5,7 +5,7 @@ Ver mis entregas --> GET - tareas/mis-entregas
 Actualizar información --> PUT alumno/update
 Ver canciones solicitadas --> GET musica/sugerencias
 */
-import type { Entrega, EstadoSolicitud, User, UsuarioActualizado } from "../types";
+import type { Entrega, User, UsuarioActualizado } from "../types";
 
 const URL = import.meta.env.VITE_API_URL;
 
@@ -25,26 +25,6 @@ export const fetchMisEntregas = async (token: string) : Promise<Entrega[]> => {
         return await response.json();
     } catch(err) {
         console.error("Fallo al obtener las entregas: ", err);
-        return [];
-    }
-}
-
-export const fetchMisSolicitudes = async (token: string) : Promise<EstadoSolicitud[]> => {
-    try {
-        const response = await fetch(`${URL}/musica/sugerencias`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if(!response.ok) {
-            throw new Error(`Error al cargar las entregas que has realizado: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch(err) {
-        console.error("Fallo al obtener las solicitudes: ", err);
         return [];
     }
 }

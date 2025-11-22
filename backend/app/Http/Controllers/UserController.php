@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -117,6 +118,95 @@ class UserController extends Controller {
         return response()->json([
             'nombre' => $profesor->name,
             'email' => $profesor->email
+        ], 200);
+    }
+
+    /*
+     * Crear
+     * ===============
+     * Método para crear un usuario. Será solo posible por el administrador y se requerirá enviar los siguientes datos:
+     *  1. Nombre del nuevo usuario
+     *  2. Email del nuevo usuario
+     *  3. Rol del usuario. Posibles opciones:
+     *      1. ESTUDIANTE --> Saldrá un nuevo campo de PROFESOR (donde se le asignará dicho profesor con un select)
+     *      2. PROFESOR --> Saldrá un nuevo campo de ADMIN
+     *
+     * Devolverá un objeto json con la respuesta
+     */
+    public function crear(Request $request) {
+        $user = Auth::user();
+
+        if(!$user || $user->role !== "ADMIN") {
+            return response()->json(["error" => "No tienes permisos suficientes para crear un usuario nuevo."], 403);
+        }
+
+        $validacion = Validator::make($request->all(), [
+            'name' => 'required|string|max:100',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+            'role' => 'required|string|in:ADMIN,ESTUDIANTE,PROFESOR',
+            'profesor_id' => 'nullable|numeric|exists:users,id'
+        ]);
+
+        if($validacion->fails()) {
+            return response()->json($validacion->errors(), 422);
+        }
+
+        $datosUsuario = $request->only(['name', 'email', 'role']);
+        $datosUsuario["password"] = Hash::make($request->password);
+        $datosUsuario["puntos"] = 0;
+
+        if(strtoupper($datosUsuario["role"]) === "ESTUDIANTE") {
+            if(!$request->filled('profesor_id')) {
+                return response()->json(["error" => "El campo ID Profesor es obligatorio para los usuarios ESTUDIANTES"], 422);
+            }
+
+            // Comprobar que realmente ese usuario es profesor
+            $profesor = User::find($request->profesor_id);
+            if(!$profesor || ($profesor->isProfesor() && !$profesor->isAdmin())) {
+                return response()->json(["error" => "El ID proporcionado no pertenece a un profesor o administrador"], 422);
+            }
+
+            $datosUsuario["profesor_id"] = $request->profesor_id;
+        } elseif (strtoupper($datosUsuario["role"]) === "PROFESOR"
+            || strtoupper($datosUsuario["role"] === "ADMIN")) {
+            $datosUsuario["profesor_id"] = null;
+        }
+
+        try {
+            $nuevo = User::create($datosUsuario);
+
+            return response()->json([
+                'message' => 'El usuario se ha creado correctamente',
+                'user' => $nuevo,
+            ], 201);
+        } catch(\Exception $e) {
+            return response()->json([
+                "error" => "Error al crear el usuario. Por favor, asegurate que los datos sean correctos."
+            ], 500);
+        }
+    }
+
+    /*
+     * ObtenerProfesores
+     * ========================
+     * Este método se encargará de obtener el nombre y el email de todos los usuarios con rol profesor o admin, para que
+     * se pueda asignar dicho usuario a un estudiante.
+     */
+    public function obtenerProfesores() {
+        $usuarioActual = Auth::user();
+
+        if($usuarioActual->role !== "ADMIN") {
+            return response()->json([
+                "error" => "No tienes suficientes permisos para ver los profesores"
+            ], 403);
+        }
+
+        $profesores = User::where("role", ["PROFESOR", "ADMIN"])
+            ->get(["id", "name", "email", "role"]);
+        
+        return response()->json([
+            "profesores" => $profesores,
         ], 200);
     }
 }

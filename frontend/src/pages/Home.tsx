@@ -290,6 +290,7 @@ const Home: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    <Footer />
                 </div>
             </>
         );
@@ -308,8 +309,8 @@ const Home: React.FC = () => {
                         <Tareas />
                     </div>
                 </div>
+                <Footer />
             </div>
-            <Footer />
         </>
     );
 }

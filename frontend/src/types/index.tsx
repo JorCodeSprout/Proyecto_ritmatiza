@@ -3,12 +3,18 @@ export type EstadoEntrega = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
 export type EstadoSolicitud = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 
 export interface User {
-    id: number;
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
     puntos: number;
     profesor_id: number | null;
+}
+
+export interface ProfesorAdmin {
+    id: number;
+    email: string;
+    name: string;
+    role: "PROFESOR" | "ADMIN";
 }
 
 export interface UsuarioActualizado {
@@ -18,6 +24,20 @@ export interface UsuarioActualizado {
     password?: string;
     password_confirmation?: string;
     current_password?: string;
+}
+
+export interface CrearUsuario {
+    email: string;
+    name: string;
+    password: string;
+    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
+    puntos?: number;
+    profesor_id: number | null;
+}
+
+export interface CrearUsuarioAdminProps {
+    profesores?: ProfesorAdmin[];
+    adminToken: string | null;
 }
 
 export interface LayoutProps {

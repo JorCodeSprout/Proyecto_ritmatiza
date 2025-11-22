@@ -11,6 +11,7 @@ import DatosPersonales from "./pages/DatosPersonales.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import EntregasPage from "./pages/EntregasPage.tsx";
 import Politica from "./pages/Politica.tsx";
+import Usuarios from "./pages/Usuarios.tsx";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/datosPersonales" element={<DatosPersonales />} />
           <Route path="/entregas" element={<EntregasPage />} />
+          <Route path="/usuarios" element={<Usuarios />} />
         </Routes>
       </Router>
     </AuthProvider>
