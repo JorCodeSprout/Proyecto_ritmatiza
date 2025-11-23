@@ -55,7 +55,7 @@ textarea:not(:placeholder-shown) ~ label {
     left: 5px;
     top: 8px;
     transition: 0.2s ease all;
-    pointer-events: none; /* Evita que la etiqueta bloquee el input */
+    pointer-events: none;
 }
 
 .term-container {

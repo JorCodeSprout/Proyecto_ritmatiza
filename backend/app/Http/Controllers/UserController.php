@@ -204,9 +204,42 @@ class UserController extends Controller {
 
         $profesores = User::where("role", ["PROFESOR", "ADMIN"])
             ->get(["id", "name", "email", "role"]);
-        
+
         return response()->json([
             "profesores" => $profesores,
         ], 200);
+    }
+
+    /*
+     * ObtenerUsuarios
+     * ========================
+     * Este método se encargará de mostrar al ADMIN y a los PROFESORES un listado de los usuarios divididos
+     * de la siguiente manera:
+     *  1. ADMIN
+     *      - Podrá ver TODOS los usuarios registrados en la aplicación
+     *  2. PROFESORES
+     *      - Podrán ver TODOS los alumnos que tienen a su cargo
+     */
+    public function obtenerUsuarios() {
+        $usuarioActual = Auth::user();
+
+        $todos = User::all(["id", "name", "email", "role", "puntos", "profesor_id"]);
+
+        $misAlumnos = User::where("profesor_id", $usuarioActual->id)
+            ->get(["id", "name", "email", "puntos"]);
+
+        if($usuarioActual->role === "ADMIN") {
+            return response()->json([
+                "usuarios" => $todos
+            ], 200);
+        } elseif($usuarioActual->role === "PROFESOR") {
+            return response()->json([
+                "usuarios" => $misAlumnos
+            ], 200);
+        }
+
+        return response()->json([
+            "error" => "No tienes permisos suficientes para ver el resto de usuarios"
+        ], 403);
     }
 }

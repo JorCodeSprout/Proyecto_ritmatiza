@@ -68,6 +68,10 @@ Route::middleware('auth:api')->group(function () {
 
         // Calificar tarea
         Route::post('entregas/{entrega}/calificar', [TareaController::class, 'calificarEntrega']);
+
+        Route::controller(UserController::class)->prefix("/usuario")->group(function () {
+            Route::get("/all", "obtenerUsuarios");
+        });
     });
 
     Route::middleware('can:admin-only')->group(function () {

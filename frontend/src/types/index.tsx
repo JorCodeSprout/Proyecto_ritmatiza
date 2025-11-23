@@ -40,6 +40,26 @@ export interface CrearUsuarioAdminProps {
     adminToken: string | null;
 }
 
+export interface UsuarioAdmin {
+    id: number;
+    name: string;
+    email: string;
+    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN'; // Utiliza el tipo 'role' ya definido
+    puntos: number;
+    profesor_id: number | null;
+}
+
+export interface UsuarioProfesor {
+    id: number;
+    name: string;
+    email: string;
+    puntos: number;
+}
+
+export interface RespuestaObtenerUsuarios {
+    usuarios: UsuarioAdmin[] | UsuarioProfesor[];
+}
+
 export interface LayoutProps {
     children: React.ReactNode;
     includeFooter?: boolean;

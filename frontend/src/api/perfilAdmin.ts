@@ -3,8 +3,9 @@ PETICIONES
 ===========================
 Crear un nuevo usuario --> POST - usuario/crear
 Obtener todos los profesores y admin --> GET - usuario/profesores
+Mostrar los usuarios --> GET - usuario/all
 */
-import type { CrearUsuario, ProfesorAdmin } from "../types";
+import type { CrearUsuario, ProfesorAdmin, RespuestaObtenerUsuarios } from "../types";
 
 const URL = import.meta.env.VITE_API_URL;
 
@@ -50,6 +51,32 @@ export const fetchProfesores = async (token: string | null): Promise<ProfesorAdm
         return data.profesores;
     } catch(err) {
         console.error(`Error al cargar los profesores`, err);
+        throw err;
+    }
+}
+
+export const fetchUsuarios = async (token: string | null) : Promise<RespuestaObtenerUsuarios> => {
+    try {
+        if(!token) {
+            throw new Error("Token de autenticación no proporcionado");
+        }
+
+        const response = await fetch(`${URL}/usuario/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if(!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || `Error al obtener los usuarios: ${response.statusText}`);
+        }
+
+        const data: RespuestaObtenerUsuarios = await response.json();
+        return data;
+    } catch(err) {
+        console.error("Error al cargar los usuarios");
         throw err;
     }
 }
