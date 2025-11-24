@@ -244,4 +244,27 @@ class SpotifyApiService {
             return null;
         }
     }
+
+    public function eliminarCancion(string $trackUri, string $playlistId, string $accessToken) {
+        try {
+            $response = $this->cliente->delete($this->baseUrl . "playlists/{$playlistId}/tracks", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'tracks' => [
+                        [ 
+                            'uri' => $trackUri 
+                        ]
+                    ]
+                ]
+            ]);
+
+            return $response->getStatusCode() === 200;
+        } catch(ClientException $e) {
+            Log::error("Spotify API Delete Error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

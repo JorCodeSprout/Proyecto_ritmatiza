@@ -1,6 +1,7 @@
 export type EstadoSugerencia = "APROBADA" | "SUSPENDIDA" | "PENDIENTE";
 export type EstadoEntrega = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
 export type EstadoSolicitud = "PENDIENTE" | "APROBADA" | "RECHAZADA";
+export type EstadoReproduccion = "PENDIENTE" | "REPRODUCIDA" | "SALTADA";
 
 export interface User {
     email: string;
@@ -17,7 +18,16 @@ export interface ProfesorAdmin {
     role: "PROFESOR" | "ADMIN";
 }
 
+export interface Estudiantes {
+    id: number;
+    email: string;
+    name: string;
+    role: "ESTUDIANTE";
+    puntos: number;
+}
+
 export interface UsuarioActualizado {
+    id?: number;
     email?: string;
     email_confirmation?: string;
     current_email?: string;
@@ -31,8 +41,16 @@ export interface CrearUsuario {
     name: string;
     password: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
-    puntos?: number;
     profesor_id: number | null;
+}
+
+export interface EditarUsuario {
+    id?: number;
+    email?: string;
+    email_confirmation?: string;
+    name?: string;
+    puntos?: number;
+    role?: string;
 }
 
 export interface CrearUsuarioAdminProps {
@@ -44,7 +62,7 @@ export interface UsuarioAdmin {
     id: number;
     name: string;
     email: string;
-    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN'; // Utiliza el tipo 'role' ya definido
+    role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
     puntos: number;
     profesor_id: number | null;
 }
@@ -115,6 +133,15 @@ export interface SongItem {
     }[];
 };
 
+export interface CancionPlaylist {
+    id: number;
+    id_spotify: string;
+    titulo: string;
+    artista: string;
+    anadida_por_id: number;
+    estado_reproduccion: EstadoReproduccion;
+}
+
 export interface Entrega {
     id: number;
     ruta: string;
@@ -171,6 +198,12 @@ export interface PanelNoLogueado {
 export interface ActualizarPropForm {
     setError: (message: string | null) => void;
     setSuccess: (message: string | null) => void;
+}
+
+export interface EditarPropForm {
+    setError: (message: string | null) => void;
+    setSuccess: (message: string | null) => void;
+    id: string;
 }
 
 export interface Profesor {

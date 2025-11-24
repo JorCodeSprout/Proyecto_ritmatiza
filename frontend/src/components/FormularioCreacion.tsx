@@ -120,7 +120,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
             {error && <p style={{color: "red"}}>{error}</p>}
             {success && <p style={{color: "green"}}>{success}</p>}
 
-            <div className="input-container">
+            <div className={styles.input_container}>
                 <input 
                     type="text" 
                     name="name" 
@@ -134,7 +134,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="name">Nombre completo *</label>
             </div>
 
-            <div className="input-container">
+            <div className={styles.input_container}>
                 <input 
                     type="email" 
                     name="email" 
@@ -149,7 +149,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="email">Correo corporativo *</label>
             </div>
 
-            <div className="input-container">
+            <div className={styles.input_container}>
                 <input 
                     type="password" 
                     name="password" 
@@ -164,7 +164,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="password">Contraseña *</label>
             </div>
 
-            <div className="input-container">
+            <div className={styles.input_container}>
                 <input 
                     type="password" 
                     name="passwordConfirmation" 
@@ -217,7 +217,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 </div>
             )}
 
-            <button type="submit" disabled={loading}>
+            <button className={styles.crear} type="submit" disabled={loading}>
                 {loading ? "Creando usuario..." : "Crear Usuario"}
             </button>
         </form>

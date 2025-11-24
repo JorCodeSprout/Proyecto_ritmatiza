@@ -140,6 +140,7 @@
 }
 
 .logoutButton:hover{
-    transform: scale(0.8);
+    transform: scale(1);
+    background-color: #C60000;
     left: 30px;
 }

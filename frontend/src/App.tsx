@@ -8,10 +8,12 @@ import ContactoPage from "./pages/ContactoPage";
 import CrearTareasPage from "./pages/CrearTareasPage.tsx";
 import MusicPage from "./pages/MusicPage.tsx";
 import DatosPersonales from "./pages/DatosPersonales.tsx";
-import Perfil from "./pages/Perfil.tsx";
 import EntregasPage from "./pages/EntregasPage.tsx";
 import Politica from "./pages/Politica.tsx";
 import Usuarios from "./pages/Usuarios.tsx";
+import Alumnos from "./pages/Alumnos.tsx";
+import EditarAdmin from "./components/EditarAdmin.tsx";
+import EditarProfesor from "./components/EditarProfesor.tsx";
 
 export default function App() {
   return (
@@ -26,10 +28,12 @@ export default function App() {
           <Route path="/contacto" element={<ContactoPage/>} />
           <Route path="/tareas/crear" element={<CrearTareasPage/>} />
           <Route path="/musica" element={<MusicPage/>} />
-          <Route path="/perfil" element={<Perfil />} />
           <Route path="/datosPersonales" element={<DatosPersonales />} />
           <Route path="/entregas" element={<EntregasPage />} />
           <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/usuarios/:userId/edit" element={<EditarAdmin />} />
+          <Route path="/alumnos" element={<Alumnos />} />
+          <Route path="/alumnos/:alumnoId/edit" element={<EditarProfesor />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -17,6 +17,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +25,20 @@ use Illuminate\Support\Facades\Validator;
 
 class MusicaController extends Controller {
     protected SpotifyApiService $spotifyApiService;
+
+    private const CACHE_KEY_PREFIX = 'spotify_admin_tokens_';
+
+    private function getAdminAccessToken() {
+        $userId = Auth::id();
+        $cacheKey = self::CACHE_KEY_PREFIX . $userId;
+
+        if(Cache::has($cacheKey)) {
+            $tokens = Cache::get($cacheKey);
+            return $tokens['access_token'] ?? null;
+        }
+
+        return null;
+    }
 
     public function __construct(SpotifyApiService $spotifyService) {
         $this->middleware('auth:api');
@@ -99,32 +114,59 @@ class MusicaController extends Controller {
      *
      * En el caso de ser añadida a la playlist, la canción pasará a tener un estado de APROBADA.
      */
-    public function anadirPlaylist(Request $request) {
+    public function anadirPlaylist(Request $request, Sugerencia $sugerencia) {
         if(Gate::denies('admin-only')) {
             return response()->json(['error' => 'Solo el administrador puede gestionar la playlist']);
         }
 
-        $validado = Validator::make($request->all(), [
-            'id_spotify_cancion' => 'required|string|max:100|unique:canciones_playlist,id_spotify_cancion',
-            'titulo' => 'required|string|max:255',
-            'artista' => 'required|string|max:255',
+        $unica = Validator::make([
+            'id_spotify' => $sugerencia->id_spotify_cancion
+        ], [
+            'id_spotify' => 'required|unique:canciones_playlists,id_spotify_cancion',
         ]);
 
-        if($validado->fails()) {
-            return response()->json($validado->errors(), 422);
+        if($unica->fails()) {
+            return response()->json([
+                "error" => "La canción ya está en la playlist"
+            ], 422);
         }
 
-        $cancion = CancionPlaylist::create([
-            'id_spotify_cancion' => $request->id_spotify_cancion,
-            'titulo' => $request->titulo,
-            'artista' => $request->artista,
+        $token = $this->getAdminAccessToken();
+        if(!$token) {
+            return response()->json([
+                'error' => 'Error de autenticación Spotify. El Administrador debe volver a autenticarse.'
+            ], 401);
+        }
+
+        $playlistId = config('services.spotify.playlist_id');
+        $trackUri = "spotify:track:{$sugerencia->id_spotify_cancion}";
+
+        $anadirSpotify = $this->spotifyApiService->anadirCancion($trackUri, $playlistId, $token);
+
+        if(!$anadirSpotify) {
+            Log::error('No se ha podido añadir la canción a Spotify.', [
+                'track_uri' => $trackUri,
+                'admin_id' => Auth::id()
+            ]);
+            return response()->json([
+                'error' => 'Fallo al añadir la canción a Spotify'
+            ], 503);
+        }
+
+        $cancionAnadida = CancionPlaylist::create([
+            'id_spotify' => $sugerencia->id_spotify_cancion,
+            'artista' => $sugerencia->artista,
+            'titulo' => $sugerencia->titulo,
             'anadida_por_id' => Auth::id(),
+            'estado_reproduccion' => 'PENDIENTE'
         ]);
 
-        Sugerencia::where('id_spotify_cancion', $request->id_spotify_cancion)
-            ->update(['estado' => 'APROBADA']);
+        $sugerencia->update(['estado' => 'APROBADA']);
 
-        return response()->json(['message' => 'Canción añadida a la playlist', 'cancion' => $cancion], 201);
+        return response()->json([
+            "message" => "Canción añadida a la playlist",
+            "cancion" => $cancionAnadida
+        ], 201);
     }
 
     /*
@@ -135,39 +177,40 @@ class MusicaController extends Controller {
      * con un estado de SUSPENDIDA. Al igual que anadirPlaylist será necesario ser admin para poder realizar cambios en
      * la playlist, por lo que si no eres administrador, se te mostrará un mensaje de error de acceso.
      *
-     * Devolverá un mensaje de que se ha cancelado la sugerencia o en el caso de que ocurra algun error, se mostrará
-     * un mensaje de error 404 al encontrar la solicitud con dicho id.
+     * Devolverá un mensaje de que se ha cancelado la sugerencia.
      */
-    public function cancelarCancion(Request $request) {
+    public function cancelarCancion(Request $request, Sugerencia $sugerencia) {
         if(Gate::denies('admin-only')) {
             return response()->json(['error' => 'Solo el administrador puede gestionar la playlist']);
         }
 
-        $validado = Validator::make($request->all(), [
-            'id_spotify_cancion' => 'required|string|max:100|unique:canciones_playlist,id_spotify_cancion',
-            'titulo' => 'required|string|max:255',
-            'artista' => 'required|string|max:255',
-        ]);
-
-        if($validado->failed()) {
-            return response()->json($validado->errors(), 422);
-        }
-
-        $id_cancion = $request->id_spotify_cancion;
-
-        $actualizar = Sugerencia::where('id_spotify_cancion', $id_cancion)
-            ->update(['estado' => 'SUSPENDIDA']);
-
-        if($actualizar > 0) {
-            return response()->json([
-                'message' => 'Sugenerencia cancelada.',
-                'id_spotify_cancion' => $id_cancion,
-            ]);
-        }
+        $sugerencia->update(['estado' => 'RECHAZADA']);
 
         return response()->json([
-            'error' => 'No se encontró ninguna sugerencia pendiente con ese ID de Spotify'
-        ], 404);
+            "message" => "Sugerencia rechazada correctamente",
+            "cancion" => $sugerencia
+        ], 200);
+    }
+
+    /*
+     * MarcarComoReproducida
+     * =================================
+     * Método que se encargará de actualizar el estado de las canciones de la playlist. Solo el administrador tendrá acceso
+     * para actualizar el estado, y en caso de no serlo se te rechazará el acceso.
+     *
+     * Devuelve el objeto CancionPlaylist
+     */
+    public function marcarComoReproducida(CancionPlaylist $cancion) {
+        if(Gate::denies('admin-only')) {
+            return response()->json(['error' => 'Solo el administrador puede gestionar la playlist']);
+        }
+
+        $cancion->update(['estado_reproduccion' => 'REPRODUCIDA']);
+
+        return response()->json([
+            'message' => 'Canción marcada como reproducida y eliminada de la playlist',
+            'cancion' => $cancion
+        ], 200);
     }
 
     /*
@@ -177,7 +220,11 @@ class MusicaController extends Controller {
      * llame a dicho método.
      */
     public function getPlaylist() {
-        return response()->json(CancionPlaylist::all());
+        $playlistActiva = CancionPlaylist::where('estado_reproduccion', 'PENDIENTE')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return response()->json($playlistActiva);
     }
 
     /*
@@ -191,7 +238,7 @@ class MusicaController extends Controller {
             'query' => 'required|string|min:3'
         ]);
 
-        if($validado->failed()) {
+        if($validado->fails()) {
             return response()->json($validado->errors(), 422);
         }
 
@@ -220,5 +267,37 @@ class MusicaController extends Controller {
             Log::error(`Error al intentar buscar en Spotify: {$e->getMessage()}`);
             return response()->json(['error' => 'Error de conexión con Spotify'], 500);
         }
+    }
+
+    /*
+     * EliminarCancionPlaylist
+     * =================================
+     * Método que se encargará de eliminar oficialmente la canción que se reproduzca de la playlist oficial de Spotify
+     * siempre y cuando haya un mínimo de 10 canciones. De esta manera no habrá una cantidad infinita de canciones y se
+     * controlará de mejor manera dicha playlist.
+     */
+    public function eliminarCancionPlaylist(CancionPlaylist $cancionPlaylist) {
+        if(Gate::denies('admin-only')) {
+            return response()->json(['error' => 'Solo el administrador puede eliminar la playlist']);
+        }
+
+        $accessToken = $this->getAdminAccessToken();
+        if(!$accessToken) {
+            return response()->json(['error' => 'No se pudo obtener el token de Spotify'], 401);
+        }
+
+        $playlistId = config('services.spotify.playlist_id');
+        $track = "spotify:track:{$cancionPlaylist->id_spotify}";
+
+        $eliminarSpotify = $this->spotifyApiService->eliminarCancion($track, $playlistId, $accessToken);
+
+        if(!$eliminarSpotify) {
+            return response()->json([
+                'error' => 'Falló la eliminación de Spotify. Revisa tus permisos a la playlist.'
+            ], 503);
+        }
+
+        $cancionPlaylist->delete();
+        return response()->json([null, 204]);
     }
 }

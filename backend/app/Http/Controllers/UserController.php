@@ -51,7 +51,7 @@ class UserController extends Controller {
         }
 
         $validacion = Validator::make($request->all(), [
-            'email' => 'sometimes|string|min:30|confirmed',
+            'email' => 'sometimes|string|max:100|confirmed',
             'current_email' => 'nullable|required_with:email|string',
             'password' => 'sometimes|string|min:6|confirmed',
             'current_password' => 'nullable|required_with:password|string'
@@ -89,6 +89,89 @@ class UserController extends Controller {
 
         $user->update($dataActualizar);
         return response()->json($user->only(['id', 'name', 'email', 'role', 'puntos', 'profesor_id']), 200);
+    }
+
+    /*
+     * ActualizarUsuario
+     * ==============================
+     * Este método se encargará de actualizar los datos de un usuario elegido por el profesor o el administrador. Dichos
+     * datos serán el email, el nombre, los puntos o el rol. En el caso de que el usuario no tenga los permisos de ADMIN
+     * o PROFESOR se devolverá un error de permisos. Es necesario por tanto estar logueado.
+     */
+    public function actualizarUsuario(Request $request, $id) {
+        $user = Auth::user();
+        if(!$user) {
+            return response()->json(["error" => "Usuario no autenticado"], 401);
+        }
+
+        if(!($user->isAdmin() || $user->isProfesor())) {
+            return response()->json([
+                "error" => "No tienes permisos suficientes para editar un usuario"
+            ], 403);
+        }
+
+        $usuario_actualizar = User::find($id);
+
+        if(!$usuario_actualizar) {
+            return response()->json([
+                "error" => "Usuario con ID ${id} no encontrado"
+            ], 404);
+        }
+
+        $dataActualizar = [];
+
+        $validacion = Validator::make($request->all(), [
+            'name' => 'sometimes|string|min:6',
+            // Se confirma que el email sea único en la tabla users excluyendo el email del usuario que estamos actualizando
+            'email' => 'sometimes|string|max:100|unique:users,email,' . $id,
+            'email_confirmation' => 'required_with:email|string',
+            'role' => 'sometimes|string',
+            'puntos' => 'sometimes|numeric|min:0',
+        ]);
+
+        if($validacion->fails()) {
+            return response()->json([
+                "error" => "Error de validación al actualizar los datos",
+                "message" => $validacion->errors()
+            ], 422);
+        }
+
+        if($request->filled('name')) {
+            $dataActualizar['name'] = $request->name;
+        }
+
+        if($user->isProfesor() || $user->isAdmin()) {
+            if ($request->filled('role')) {
+                if (!in_array($request->role, ['ADMIN', 'PROFESOR', 'ESTUDIANTE'])) {
+                    return response()->json([
+                        "error" => "El rol seleccionado no es válido"
+                    ], 403);
+                }
+
+                $dataActualizar['role'] = $request->role;
+            }
+
+            if ($request->filled('puntos')) {
+                $puntos = (int)$request->input("puntos");
+
+                if ($puntos < 0) {
+                    return response()->json([
+                        "error" => "Los puntos deben ser un número positivo"
+                    ], 403);
+                }
+
+                $dataActualizar['puntos'] = $puntos;
+            }
+        }
+
+        if(empty($dataActualizar)) {
+            return response()->json([
+                "message" => "No se proporcionaron datos suficientes para actualizar"
+            ], 200);
+        }
+
+        $usuario_actualizar->update($dataActualizar);
+        return response()->json($usuario_actualizar->only(['id', 'name', 'email', 'role', 'puntos']));
     }
 
     /*
@@ -202,7 +285,7 @@ class UserController extends Controller {
             ], 403);
         }
 
-        $profesores = User::where("role", ["PROFESOR", "ADMIN"])
+        $profesores = User::whereIn("role", ["PROFESOR", "ADMIN"])
             ->get(["id", "name", "email", "role"]);
 
         return response()->json([

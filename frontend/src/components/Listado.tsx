@@ -4,61 +4,85 @@ import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import { fetchUsuarios } from "../api/perfilAdmin";
 import styles from "../assets/styles/Usuarios.module.css"
+import { Link } from "react-router-dom";
 
-export const TablaAdmin: React.FC<{usuarios: UsuarioAdmin[]}> = ({usuarios}) => (
+export const TablaAdmin: React.FC<{usuarios: UsuarioAdmin[], loading: boolean}> = ({usuarios, loading}) => (
     <div className={styles.tabla_card}>
-        <h3 style={{fontSize: '1.25rem', fontWeight: '600'}}>Listado General de Usuarios</h3>
+        <h3 className={styles.titulo_listado}>Listado General de Usuarios</h3>
         
         <div className={styles.tabla_scroll_container}>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {usuarios.map((u) => (
-                        <tr key={u.id}>
-                            <td>{u.name}</td>
-                            <td>{u.email}</td>
-                            <td>{u.role}</td>
-                            <td>
-                                <a href="#">Editar</a>
-                            </td>
+            {loading ? (
+                <p style={{marginLeft: "20px"}}>Cargando usuarios...</p>
+            ) : (
+                usuarios.length <= 0 ? (
+                    <p style={{color: "red"}}>No existen usuarios</p>
+                ) : (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th></th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {usuarios.map((u) => (
+                            <tr key={u.id}>
+                                <td>{u.name}</td>
+                                <td>{u.email}</td>
+                                <td>{u.role}</td>
+                                <td>
+                                    {u.role !== "ADMIN" && (
+                                        <Link to={`/usuarios/${u.id}/edit`}>Editar</Link>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ))}
         </div>
     </div>
 );
 
-export const TablaProfesor: React.FC<{alumnos: UsuarioProfesor[]}> = ({alumnos}) => (
-    <div>
-        <h3>Estudiantes Asignados</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Puntos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {alumnos.map((a) => (
-                    <tr key={a.id}>
-                        <td>{a.id}</td>
-                        <td>{a.name}</td>
-                        <td>{a.email}</td>
-                        <td>{a.puntos}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+export const TablaProfesor: React.FC<{alumnos: UsuarioProfesor[], loading: boolean}> = ({alumnos, loading}) => (
+    <div className={styles.tabla_card2}>
+        <h3 className={styles.titulo_listado}>Estudiantes Asignados</h3>
+        <div className={styles.tabla_scroll_container2}>
+            {loading ? (
+                <p>Cargando alumnos...</p>
+            ) : (
+                alumnos.length <= 0 ? (
+                    <p style={{color: "red"}}>No tienes alumnos a tu cargo</p>
+                ) :  (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Puntos</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {alumnos.map((a) => (
+                                <tr key={a.id}>
+                                    <td>{a.id}</td>
+                                    <td>{a.name}</td>
+                                    <td>{a.email}</td>
+                                    <td>{a.puntos}</td>
+                                    <td>
+                                        <Link to={`/alumnos/${a.id}/edit`}>Editar</Link>
+                                </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )
+            )}
+        </div>
     </div>
 );
 
@@ -100,10 +124,13 @@ const ListadoUsuarios: React.FC = () => {
     return (
         <>
             {error && <p style={{color: "red"}}>{error}</p>}
-            {loading && <p>Cargando usuarios...</p>}
 
             {role === "ADMIN" && (
-                <TablaAdmin usuarios={usuarios as UsuarioAdmin[]} />
+                <TablaAdmin usuarios={usuarios as UsuarioAdmin[]} loading={loading} />
+            )}
+
+            {role === "PROFESOR" && (
+                <TablaProfesor alumnos={usuarios as UsuarioProfesor[]} loading={loading} />
             )}
 
             {role !== "PROFESOR" && role !== "ADMIN" && (

@@ -25,6 +25,7 @@ Route::get('tareas/ultimas', [TareaController::class, 'ultimasTareas']);
 Route::get('tareas/profesor/{profesorId}', [TareaController::class, 'getTareasByProfesor']);
 Route::get('spotify_token', [SpotifyTokenController::class, 'getSpotifyToken']);
 Route::post("contacto", [ContactController::class, "send"]);
+Route::get('spotify/callback', [SpotifyAuthController::class, 'callback']);
 
 
 Route::middleware('auth:api')->group(function () {
@@ -51,7 +52,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(MusicaController::class)->prefix('/musica')->group(function () {
         Route::get('playlist', 'getPlaylist');
         Route::post('sugerir', 'sugerirCancion');
-        Route::get('buscar-spotify', 'buscarSpotify');
+        Route::get('buscar', 'buscarSpotify');
 
         // Ruta para ver TODAS las sugerencias
         Route::get('sugerencias', 'listado');
@@ -71,6 +72,7 @@ Route::middleware('auth:api')->group(function () {
 
         Route::controller(UserController::class)->prefix("/usuario")->group(function () {
             Route::get("/all", "obtenerUsuarios");
+            Route::put("{usuario}/cambiar", "actualizarUsuario");
         });
     });
 
@@ -81,13 +83,14 @@ Route::middleware('auth:api')->group(function () {
 
         Route::controller(MusicaController::class)->prefix('/musica')->group(function () {
             // 1. Aceptar Sugerencia (Añadir a playlist)
-            Route::post('playlist/add', 'anadirPlaylist');
+            Route::post('sugerencias/{sugerencia}/add', 'anadirPlaylist');
 
-            // 2. Eliminar cancion de playlist (Eliminacion fisica)
-            Route::delete('playlist/eliminar', 'eliminarCancionPlaylist');
+            // 2. Eliminar canción de playlist (Eliminacion fisica)
+            Route::delete('playlist/{cancion}/eliminar', 'eliminarCancionPlaylist');
 
             // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
-            Route::post('sugerencias/cancelar', 'cancelarCancion');
+            Route::post('sugerencias/{sugerencia}/cancelar', 'cancelarCancion');
+            Route::patch('playlist/{cancion}/reproducida', 'marcarComoReproducida');
         });
 
         Route::controller(UserController::class)->prefix('/usuario')->group(function () {

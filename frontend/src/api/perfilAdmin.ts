@@ -4,8 +4,9 @@ PETICIONES
 Crear un nuevo usuario --> POST - usuario/crear
 Obtener todos los profesores y admin --> GET - usuario/profesores
 Mostrar los usuarios --> GET - usuario/all
+Actualizar un usuario --> PUT usuario/{usuario}/cambiar
 */
-import type { CrearUsuario, ProfesorAdmin, RespuestaObtenerUsuarios } from "../types";
+import type { CrearUsuario, EditarUsuario, ProfesorAdmin, RespuestaObtenerUsuarios, User } from "../types";
 
 const URL = import.meta.env.VITE_API_URL;
 
@@ -45,7 +46,7 @@ export const fetchProfesores = async (token: string | null): Promise<ProfesorAdm
         const data = await response.json();
 
         if(!response.ok) {
-            throw new Error(data.error || "Error al crear el usuario");
+            throw new Error(data.error || "Error al cargar los profesores");
         }
 
         return data.profesores;
@@ -77,6 +78,35 @@ export const fetchUsuarios = async (token: string | null) : Promise<RespuestaObt
         return data;
     } catch(err) {
         console.error("Error al cargar los usuarios");
+        throw err;
+    }
+}
+
+export const fetchActualizarDatosAdmin = async (token: string, datos: EditarUsuario): Promise<User> => {
+    if(!datos.id) {
+        throw new Error("El ID del usuario a actualizar es obligatorio")
+    }
+
+    const datosBody = { ...datos };
+    delete datosBody.id;
+
+    try {
+        const response = await fetch(`${URL}/usuario/${datos.id}/cambiar`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosBody)
+        });
+
+        if(!response.ok) {
+            throw new Error(`No se han podido actualizar los datos: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch(err) {
+        console.error("Error al actualizar los datos", err);
         throw err;
     }
 }
