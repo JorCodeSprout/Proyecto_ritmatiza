@@ -35,6 +35,9 @@ const TareaCard: React.FC<{tarea: Tarea, reloadEntregas?: () => Promise<void>, e
                 <button onClick={handleCambiar} id={styles.mostrarMas}>{expandido ? 'Ver menos' : 'Ver más'}</button>
             )}
             <p><strong>Recompensa: </strong>{tarea.recompensa} 🌟</p>
+            {profesorId && (
+                <p><strong>Fecha de Entrega: </strong>{tarea.fecha}</p>
+            )}
 
             {profesorId && mostrarEntregas && (
                 <div className={styles.entrega_info}>

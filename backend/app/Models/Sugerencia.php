@@ -27,7 +27,7 @@ class Sugerencia extends Model {
         'id_spotify_cancion',
         'artista',
         'titulo',
-        'sugerida_por_id',
+        'sugerencia_por_id',
         'estado', // APROBADA, SUSPENDIDA, PENDIENTE
     ];
 

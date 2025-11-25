@@ -58,6 +58,7 @@ const Sidebar: React.FC = () => {
                 return [
                     {id: 'inicio', name: 'Tareas', href: '/'},
                     {id: 'entregas', name: 'Entregas', href: '/entregas'},
+                    {id: 'canciones', name: 'Canciones', href: '/canciones'},
                     {id: 'solicitudes', name: 'Solicitudes', href: '/solicitudes'},
                     { id: 'contacto', name: 'Contacto', href: '/contacto' },
                     {id: 'datosPersonales', name: 'Cuenta', href: '/datosPersonales'},

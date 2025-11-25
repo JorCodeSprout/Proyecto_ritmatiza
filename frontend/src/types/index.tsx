@@ -110,6 +110,7 @@ export interface Tarea {
     titulo: string;
     descripcion: string;
     recompensa: number;
+    fecha: string;
     creador_id: number | null;
     estado_entrega?: EstadoEntrega;
     entrega_id?: number | null;
@@ -133,6 +134,15 @@ export interface SongItem {
     }[];
 };
 
+export interface BotonSugerirProps {
+    cancion: SongItem;
+    puntos: number | null;
+    token: string | null;
+    sugerenciasPendientes: SugerenciasCanciones[];
+    sugerenciaEnCurso: string | null;
+    handleSugerir: (cancion: SongItem) => Promise<void>;
+}
+
 export interface CancionPlaylist {
     id: number;
     id_spotify: string;
@@ -153,11 +163,10 @@ export interface Entrega {
 }
 
 export interface SugerenciasCanciones {
-    id: number;
     id_spotify_cancion: string;
     artista: string;
     titulo: string;
-    sugerencia_por_id?: number;
+    sugerencia_por_id?: number | null;
     estado: EstadoSolicitud;
 }
 
@@ -209,4 +218,10 @@ export interface EditarPropForm {
 export interface Profesor {
     nombre: string;
     email: string;
+}
+
+export interface BuscarCancionesFormProp {
+    token: string | null;
+    resultadosBusqueda: (resultados: SongItem[]) => void;
+    setError: (message: string | null) => void;
 }

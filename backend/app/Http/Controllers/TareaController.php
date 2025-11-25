@@ -225,8 +225,11 @@ class TareaController extends Controller {
 
         try {
             $tareas = Tarea::where('creador_id', $profesorId)
+                ->whereDate('fecha', '>=', now()->toDateString())
+                ->whereDoesntHave('entregas', function ($query) use ($estudianteId) {
+                    $query->where('estudiante_id', $estudianteId);
+                })
                 ->latest()
-                ->limit(3)
                 ->when($estudianteId, function ($query) use ($estudianteId) {
                     $query->with(['entregas' => function ($q) use ($estudianteId) {
                         $q->where('estudiante_id', $estudianteId)

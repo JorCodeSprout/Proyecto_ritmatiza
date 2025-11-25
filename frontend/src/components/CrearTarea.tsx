@@ -36,8 +36,7 @@ const CrearTarea: React.FC = () => {
 
     const isAuthorized = role === "PROFESOR" || role === "ADMIN";
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement
-        | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value, type} = e.target;
 
         setTareaData(prev => ({

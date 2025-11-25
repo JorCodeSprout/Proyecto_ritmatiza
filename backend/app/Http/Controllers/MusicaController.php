@@ -62,6 +62,10 @@ class MusicaController extends Controller {
      * la sugerencia enviada.
      */
     public function sugerirCancion(Request $request) {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'No autorizado. Se requiere un token válido.'], 401);
+        }
+
         $validado = Validator::make($request->all(), [
             'id_spotify_cancion' => 'required|string|max:100|unique:sugerencias,id_spotify_cancion',
             'titulo' => 'required|string|max:255',
@@ -250,13 +254,19 @@ class MusicaController extends Controller {
 
         try {
             $response = Http::withToken($token)->get('https://api.spotify.com/v1/search', [
-                'q' => $request->query,
+                'q' => $request->query('query'),
                 'type' => 'artist,album,track',
-                'limit' => 10
+                'limit' => 9
             ]);
 
             if($response->successful()) {
-                return response()->json($response->json());
+                $data = $response->json();
+
+                if(isset($data['tracks']['items'])) {
+                    return response()->json($data['tracks']['items']);
+                }
+
+                return response()->json([], 200);
             }
 
             return response()->json([

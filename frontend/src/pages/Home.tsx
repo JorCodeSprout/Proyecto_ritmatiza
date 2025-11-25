@@ -64,8 +64,8 @@ const Home: React.FC = () => {
             setRefreshTimerId(newTimerId as unknown as number);
             
         } catch (error) {
-            console.error("ERROR: No se pudo obtener un token válido del backend. Usando fallback Mock para que la app funcione", error);
-            setErrorSongs("Fallo en la autenticación con el backend. Usando token de fallback para simulación");            
+            console.error(error);
+            setErrorSongs("Fallo en la autenticación con el backend. Refresca la página para restaurar las canciones.");            
         }
     }, [refreshTimerId]);
     

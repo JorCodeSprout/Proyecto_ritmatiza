@@ -185,7 +185,7 @@ class UserController extends Controller {
 
         if($user->role !== "ESTUDIANTE" || empty($user->profesor_id)) {
             return response()->json([
-                'message' => 'No eres estudiante o no tienes ningún profesor asignado',
+                'message' => 'No tienes ningún profesor asignado',
                 'profesor' => null
             ], 200);
         }
