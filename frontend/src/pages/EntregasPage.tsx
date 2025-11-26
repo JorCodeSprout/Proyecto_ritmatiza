@@ -6,6 +6,7 @@ import styles from '../assets/styles/Entregas.module.css';
 import Sidebar from "../components/Sidebar";
 import EntregasProfesorAdmin from "../components/EntregasProfesorAdmin";
 import EntregasEstudiante from "../components/EntregasEstudiante";
+import Footer from "../components/Footer";
 
 const EntregasPage: React.FC = () => {
     const { isLogged, role, token, id } = useAuth();
@@ -76,6 +77,7 @@ const EntregasPage: React.FC = () => {
                     <>
                         <Sidebar />
                         <EntregasEstudiante misEntregas={entregas} />
+                        <Footer />
                     </>
                 );
             case "PROFESOR":
@@ -86,6 +88,7 @@ const EntregasPage: React.FC = () => {
                             entregasPendientes={entregas} 
                             handleCalificar={handlefetchCalificar} 
                         />
+                        <Footer />
                     </>
                 );
             default:

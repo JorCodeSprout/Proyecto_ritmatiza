@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CancionPlaylist;
 use App\Models\Sugerencia;
+use App\Models\User;
 use App\Services\SpotifyApiService;
 use Exception;
 use Illuminate\Http\Request;
@@ -194,6 +195,19 @@ class MusicaController extends Controller {
         ]);
 
         $sugerencia->update(['estado' => 'APROBADA']);
+
+        $sugeridoId = $sugerencia->sugerencia_por_id;
+
+        $sugeridor = User::find($sugeridoId);
+
+        if($sugeridor) {
+            $sugeridor->decrement('puntos', 50);
+            Log::info("Se han descontado 50 puntos del usuario con ID: {$sugeridoId} por la solicitud", [
+                'puntos_actuales' => $sugeridor->puntos
+            ]);
+        } else {
+            Log::warning("No se encontró al usuario con ID: {$sugeridoId} para descontarle los puntos correspondientes");
+        }
 
         return response()->json([
             "message" => "Canción añadida a la playlist",

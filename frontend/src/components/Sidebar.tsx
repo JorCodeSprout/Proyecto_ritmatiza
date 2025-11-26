@@ -87,7 +87,7 @@ const Sidebar: React.FC = () => {
             <div className={styles.header}>
                 <Link to="/">
                     <img 
-                        src="../public/images/RITMATIZA.png"
+                        src="/images/RITMATIZA.png"
                         alt="logo" 
                         title="RITMATIZA Logo"
                         className={styles.logo}

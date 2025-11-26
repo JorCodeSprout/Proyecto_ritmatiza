@@ -44,11 +44,6 @@ const SugerenciaCard : React.FC = () => {
 
             {sugerencias.length > 0 && (
                 <div className={styles.container}>
-                    {user?.role === "ADMIN" ? (
-                        <h2>Sugerencias recibidas</h2>
-                    ) : (
-                        <h2>Mis sugerencias</h2>
-                    )}
                     <div className={styles.resultadosContainer}>
                         {sugerencias.map((s) => (
                             <div key={s.id_spotify_cancion} className={`${styles.cancionCard} ${styles[s.estado]}`}>
@@ -61,11 +56,17 @@ const SugerenciaCard : React.FC = () => {
                                     <a href={`https://open.spotify.com/track/${s.id_spotify_cancion}`} target="_blank" rel="noopener noreferrer" className={styles.escucharButton}>🎧Escuchar</a> 
                                 </article>
                                 {user?.role === "ADMIN" && (
-                                    <BotonesSolicitud cargarSugerencias={cargarSugerencias} sugerenciaId={s.id_spotify_cancion} estado={s.estado} />
+                                    <BotonesSolicitud cargarSugerencias={cargarSugerencias} sugerenciaId={s.id} estado={s.estado} />
                                 )}
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {(!loading && !error && sugerencias.length === 0) && (
+                <div>
+                    <p>No hay sugerencias pendientes</p>
                 </div>
             )}
         </>

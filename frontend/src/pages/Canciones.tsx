@@ -7,6 +7,7 @@ import { type SongItem, type SugerenciasCanciones } from "../types";
 import styles from "../assets/styles/Buscar.module.css"
 import { fetchSolicitudes, fetchSugerirCancion } from "../api/solicitudes";
 import BotonesSugerir from "../components/BotonesSugerir";
+import Footer from "../components/Footer";
 
 const Canciones: React.FC = () => {
     const {token, puntos} = useAuth();
@@ -122,6 +123,8 @@ const Canciones: React.FC = () => {
                         </div>
                     </div>
                 )}
+
+                <Footer />
             </div>
         </>
     );

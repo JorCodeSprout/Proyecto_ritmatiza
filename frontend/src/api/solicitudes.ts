@@ -65,7 +65,7 @@ export const fetchSugerirCancion = async (token: string | null, cancion: SongIte
     }
 }
 
-export const fetchAprobarSolicitud = async (token: string | null, sugerenciaID: string) => {
+export const fetchAprobarSolicitud = async (token: string | null, sugerenciaID: number | null) => {
     try {
         const response = await fetch(`${URL}/musica/sugerencias/${sugerenciaID}/add`, {
             method: 'POST',
@@ -88,7 +88,7 @@ export const fetchAprobarSolicitud = async (token: string | null, sugerenciaID: 
     }    
 }
 
-export const fetchCancelarSolicitud = async (token: string | null, sugerenciaID: string) => {
+export const fetchCancelarSolicitud = async (token: string | null, sugerenciaID: number | null) => {
     try {
         const response = await fetch(`${URL}/musica/sugerencias/${sugerenciaID}/cancelar`, {
             method: 'PATCH',

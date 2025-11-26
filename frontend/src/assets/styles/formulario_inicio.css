@@ -53,6 +53,7 @@ textarea:not(:placeholder-shown) ~ label {
     position: absolute;
     left: 5px;
     top: 8px;
+    color: #ccc;
 }
 
 .term-container {

@@ -3,9 +3,9 @@ import styles from "../assets/styles/Sugerencias.module.css";
 import { useCallback, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { fetchAprobarSolicitud, fetchCancelarSolicitud } from "../api/solicitudes";
-import type { BootonesSolicitudProps } from "../types";
+import type { BotonesSolicitudProps } from "../types";
 
-const BotonesSolicitud: React.FC<BootonesSolicitudProps> = ({cargarSugerencias, sugerenciaId, estado}) => {
+const BotonesSolicitud: React.FC<BotonesSolicitudProps> = ({cargarSugerencias, sugerenciaId, estado}) => {
     const {token, user} = useAuth();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);

@@ -4,6 +4,7 @@ export type EstadoSolicitud = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 export type EstadoReproduccion = "PENDIENTE" | "REPRODUCIDA" | "SALTADA";
 
 export interface User {
+    id: number | null;
     email: string;
     name: string;
     role: 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN';
@@ -167,6 +168,7 @@ export interface Entrega {
 }
 
 export interface SugerenciasCanciones {
+    id: number | null;
     id_spotify_cancion: string;
     artista: string;
     titulo: string;
@@ -174,9 +176,9 @@ export interface SugerenciasCanciones {
     estado: EstadoSolicitud;
 }
 
-export interface BootonesSolicitudProps {
+export interface BotonesSolicitudProps {
     cargarSugerencias: () => Promise<void>;
-    sugerenciaId: string;
+    sugerenciaId: number | null;
     estado: string;
 }
 
