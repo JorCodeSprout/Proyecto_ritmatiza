@@ -143,6 +143,10 @@ export interface BotonSugerirProps {
     handleSugerir: (cancion: SongItem) => Promise<void>;
 }
 
+export interface EstadoSugerenciaProps {
+    sugerencias: SugerenciasCanciones[];
+}
+
 export interface CancionPlaylist {
     id: number;
     id_spotify: string;
@@ -168,6 +172,12 @@ export interface SugerenciasCanciones {
     titulo: string;
     sugerencia_por_id?: number | null;
     estado: EstadoSolicitud;
+}
+
+export interface BootonesSolicitudProps {
+    cargarSugerencias: () => Promise<void>;
+    sugerenciaId: string;
+    estado: string;
 }
 
 export interface SubidaArchivosProps {

@@ -13,7 +13,7 @@ import type { CancionPlaylist, SongItem, SugerenciasCanciones } from "../types";
 
 const URL = import.meta.env.VITE_API_URL;
 
-export const fetchSolicitudes = async (token: string) : Promise<SugerenciasCanciones[]> => {
+export const fetchSolicitudes = async (token: string | null) : Promise<SugerenciasCanciones[]> => {
     try {
         const response = await fetch(`${URL}/musica/sugerencias`, {
             headers: {
@@ -91,7 +91,7 @@ export const fetchAprobarSolicitud = async (token: string | null, sugerenciaID: 
 export const fetchCancelarSolicitud = async (token: string | null, sugerenciaID: string) => {
     try {
         const response = await fetch(`${URL}/musica/sugerencias/${sugerenciaID}/cancelar`, {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'

@@ -12,7 +12,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\User;
 use App\Services\SpotifyApiService;
+use Auth;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -48,6 +51,7 @@ class SpotifyAuthController extends Controller
         }
 
         $state = Str::random(40);
+        $userState = $user->id . '|' . $state;
 
         // Almacenar el estado en la sesión para validación posterior
         $cacheState = self::CACHE_STATE_PREFIX . $user->id;
@@ -57,7 +61,7 @@ class SpotifyAuthController extends Controller
         // Definimos los permisos necesarios
         $scope = 'playlist-modify-public user-read-private';
 
-        $authUrl = $this->spotifyService->getAuthUrl($scope, $state);
+        $authUrl = $this->spotifyService->getAuthUrl($scope, $userState);
 
         return response()->json([
             'auth_url' => $authUrl
@@ -76,55 +80,69 @@ class SpotifyAuthController extends Controller
      */
     public function callback(Request $request)
     {
-        $user = auth()->user();
-        if (Gate::denies('admin-only', $user)) {
-            return response()->json(['error' => 'Acceso no autorizado.'], 403);
+        $requestStateFull = $request->input('state');
+
+        if(empty($requestStateFull) || !Str::contains($requestStateFull, '|')) {
+            Log::error("Spotify Auth: State inválido o incompleto");
+            return response()->json([
+                'error' => 'Falló la verificación de seguridad (STATE inválido'
+            ], 400);
         }
 
-        $sessionState = $request->session()->pull('spotify_auth_state');
-        $requestState = $request->input('state');
+        [$userId, $requestState] = explode('|', $requestStateFull, 2);
 
-        if (!$requestState || $requestState !== $sessionState) {
-            Log::error('Spotify Auth: Posible ataque CSRF detectado o estado no coincidente.');
-            return response()->json(['error' => 'Falló la verificación de seguridad (STATE).'], 400);
+        $user = User::find($userId);
+
+        if(!$user) {
+            Log::error("Spotify Auth: Usuario no encontrado con ID: " . $userId);
+            return response()->json([
+                'error' => 'Usuarios no encontrado'
+            ], 404);
         }
 
-        if ($request->has('error')) {
-            Log::error('Spotify Auth Error: ' . $request->input('error'));
-            return response()->json(['error' => 'La autorización de Spotify ha fallado.'], 400);
+        $cacheStateKey = self::CACHE_STATE_PREFIX . $user->id;
+        $sessionState = Cache::pull($cacheStateKey);
+
+        if(!$requestState ||$requestState !== $sessionState) {
+            Log::error("Spotify Auth Error: " . $request->input('error'));
+            return response()->json([
+                'error' => 'La autorización de Spotify ha fallado'
+            ], 400);
         }
 
         $code = $request->input('code');
 
-        if (!$code) {
-            return response()->json(['error' => 'Falta el código de autorización.'], 400);
+        if(!$code) {
+            return response()->json([
+                'error' => 'Falta el código de autorización'
+            ], 400);
         }
 
         try {
-            // Intercambia el código por tokens
             $tokens = $this->spotifyService->getAccessToken($code);
 
-            // La clave de caché es única para el administrador (auth()->id())
-            $cacheKey = self::CACHE_KEY_PREFIX . $user->id;
-
-            Cache::put($cacheKey, [
-                'access_token' => $tokens['access_token'],
-                'refresh_token' => $tokens['refresh_token'],
-                'expires_at' => now()->addSeconds($tokens['expires_in']),
-            ], $tokens['expires_in']); // Almacenar por el tiempo de vida del token
+            $user->update([
+                'spotify_access_token' => $tokens['access_token'],
+                'spotify_refresh_token' => $tokens['refresh_token'],
+                'spotify_token_expires_at' => now()->addSeconds($tokens['expires_in'] - 60)
+            ]);
 
             $spotifyUser = $this->spotifyService->obtenerUsuario($tokens['access_token']);
 
-            Log::info("Spotify tokens guardados en caché para el Admin.", ['admin_id' => $user->id, 'spotify_user_id' => $spotifyUser['id'] ?? 'N/A']);
-
-            return response()->json([
-                'message' => 'Autenticación de Spotify exitosa. Tokens guardados en caché.',
-                'spotify_user_id' => $spotifyUser['id'] ?? null
+            Log::info("Spotify tokens guardados en la BBDD para el admin" , [
+                'admin_id' => $user->id,
+                'spotify_user_id' => $spotifyUser['id'] ?? 'N/A'
             ]);
 
-        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Autenticación de Spotify exitosa. Tokens guardados en la BBDD',
+                'spotify_user_id' => $spotifyUser['id'] ?? null
+            ]);
+        } catch (Exception $e) {
             Log::error("Fallo al intercambiar el código por tokens: " . $e->getMessage());
-            return response()->json(['error' => 'Fallo al obtener los tokens de Spotify.'], 500);
+            return response()->json([
+                'error' => 'Fallo al obtener los tokens de Spotify'
+            ], 500);
         }
     }
 }

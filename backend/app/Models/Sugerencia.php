@@ -32,6 +32,6 @@ class Sugerencia extends Model {
     ];
 
     public function sugeridaPor(): BelongsTo {
-        return $this->belongsTo(User::class, 'sugerida_por_id');
+        return $this->belongsTo(User::class, 'sugerencia_por_id');
     }
 }

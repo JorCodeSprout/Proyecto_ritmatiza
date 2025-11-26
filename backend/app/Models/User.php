@@ -45,7 +45,10 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role', // ADMIN, PROFESOR, ESTUDIANTE
         'puntos',
-        'profesor_id'
+        'profesor_id',
+        'spotify_access_token',
+        'spotify_refresh_token',
+        'spotify_token_expires_at',
     ];
 
     /**
@@ -68,6 +71,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'spotify_token_expires_at' => 'datetime',
         ];
     }
 

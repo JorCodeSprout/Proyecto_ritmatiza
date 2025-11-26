@@ -15,6 +15,7 @@ import Alumnos from "./pages/Alumnos.tsx";
 import EditarAdmin from "./components/EditarAdmin.tsx";
 import EditarProfesor from "./components/EditarProfesor.tsx";
 import Canciones from "./pages/Canciones.tsx";
+import Sugerencias from "./pages/Sugerencias.tsx";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/alumnos" element={<Alumnos />} />
           <Route path="/alumnos/:alumnoId/edit" element={<EditarProfesor />} />
           <Route path="/canciones" element={<Canciones />} />
+          <Route path="/solicitudes" element={<Sugerencias />} />
         </Routes>
       </Router>
     </AuthProvider>

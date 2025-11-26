@@ -19,7 +19,7 @@ class SpotifyApiService {
     protected string $clientId;
     protected string $clientSecret;
     protected string $redirectUri;
-    protected string $baseUrl = 'https://api.spotify.com/v1/';
+    protected string $baseUrl = 'https://api.spotify.com/v1//';
 
     // Clave para almacenar el token de credenciales del cliente en el caché
     private const CLIENT_CREDENTIALS_CACHE_KEY = 'spotify_client_token';
@@ -175,7 +175,7 @@ class SpotifyApiService {
      */
     public function anadirCancion(string $trackUri, string $playlistId, string $accessToken) {
         try {
-            $this->cliente->post($this->baseUrl . "playlist/{$playlistId}/tracks", [
+            $this->cliente->post($this->baseUrl . "playlists/{$playlistId}/tracks", [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $accessToken,
                     'Content-Type' => 'application/json',

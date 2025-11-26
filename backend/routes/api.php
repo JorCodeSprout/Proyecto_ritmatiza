@@ -89,7 +89,7 @@ Route::middleware('auth:api')->group(function () {
             Route::delete('playlist/{cancion}/eliminar', 'eliminarCancionPlaylist');
 
             // 3. Cancelar Sugerencia (Cambiar estado a CANCELADA)
-            Route::post('sugerencias/{sugerencia}/cancelar', 'cancelarCancion');
+            Route::patch('sugerencias/{sugerencia}/cancelar', 'cancelarCancion');
             Route::patch('playlist/{cancion}/reproducida', 'marcarComoReproducida');
         });
 

@@ -29,15 +29,41 @@ class MusicaController extends Controller {
     private const CACHE_KEY_PREFIX = 'spotify_admin_tokens_';
 
     private function getAdminAccessToken() {
-        $userId = Auth::id();
-        $cacheKey = self::CACHE_KEY_PREFIX . $userId;
+        $admin = Auth::user();
 
-        if(Cache::has($cacheKey)) {
-            $tokens = Cache::get($cacheKey);
-            return $tokens['access_token'] ?? null;
+        if(!$admin->spotify_access_token || !$admin->spotify_refresh_token) {
+            Log::warning("Spotify tokens faltantes en la BBDD para Admin. Requerida reautenticación");
+            return null;
         }
 
-        return null;
+        if(now()->addMinutes(5)->greaterThan($admin->spotify_token_expires_at)) {
+            $refreshToken = $admin->spotify_refresh_token;
+
+            try {
+                $newToken = $this->spotifyApiService->refreshAccessToken($refreshToken);
+
+                $admin->update([
+                    'spotify_access_token' => $newToken['access_token'],
+                    'spotify_refresh_token' => $newToken['refresh_token'] ?? $refreshToken,
+                    'spotify_token_expires_at' => now()->addSeconds($newToken['expires_in'] - 60)
+                ]);
+
+                Log::info("Spotify Access Token refrescado con éxito para el Admin");
+                return $newToken['access_token'];
+            } catch(Exception $e) {
+                Log::error("Fallo crítico al refrescar el token de Spotify del Admin: " . $e->getMessage());
+
+                $admin->update([
+                    'spotify_access_token' => null,
+                    'spotify_refresh_token' => null,
+                    'spotify_token_expires_at' => null
+                ]);
+
+                return null;
+            }
+        }
+
+        return $admin->spotify_access_token;
     }
 
     public function __construct(SpotifyApiService $spotifyService) {
@@ -97,11 +123,13 @@ class MusicaController extends Controller {
      *          En este caso se te mostrarán solo las sugerencias que has realizado tú
      */
     public function listado() {
+        $relacion = 'sugeridaPor'; 
+
         Gate::allows('profesor-or-admin')
-            ? $sugerencias = Sugerencia::with('sugerencia_por_id')
+            ? $sugerencias = Sugerencia::with($relacion)
                     ->where('estado', 'PENDIENTE')
                     ->get()
-            : $sugerencias = Sugerencia::with('sugerencia_por_id')
+            : $sugerencias = Sugerencia::with($relacion)
                     ->where('sugerencia_por_id', Auth::id())
                     ->get();
 
@@ -126,7 +154,7 @@ class MusicaController extends Controller {
         $unica = Validator::make([
             'id_spotify' => $sugerencia->id_spotify_cancion
         ], [
-            'id_spotify' => 'required|unique:canciones_playlists,id_spotify_cancion',
+            'id_spotify' => 'required|unique:canciones_playlist,id_spotify',
         ]);
 
         if($unica->fails()) {
