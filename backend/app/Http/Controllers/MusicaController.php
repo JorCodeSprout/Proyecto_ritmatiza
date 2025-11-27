@@ -174,6 +174,27 @@ class MusicaController extends Controller {
         $playlistId = config('services.spotify.playlist_id');
         $trackUri = "spotify:track:{$sugerencia->id_spotify_cancion}";
 
+        $sugeridoId = $sugerencia->sugerencia_por_id;
+
+        $sugeridor = User::find($sugeridoId);
+
+        if($sugeridor) {
+            if($sugeridor->puntos < 50) {
+                return response()->json([
+                    'error' => 'El usuario que realizó la solicitud no tiene suficientes puntos'
+                ], 403);
+            }
+            
+            $sugeridor->decrement('puntos', 50);
+            Log::info("Se han descontado 50 puntos del usuario con ID: {$sugeridoId} por la solicitud", [
+                'puntos_actuales' => $sugeridor->puntos
+            ]);
+        } else {
+            Log::warning("No se encontró al usuario con ID: {$sugeridoId} para descontarle los puntos correspondientes");
+        }
+
+        $sugerencia->update(['estado' => 'APROBADA']);
+
         $anadirSpotify = $this->spotifyApiService->anadirCancion($trackUri, $playlistId, $token);
 
         if(!$anadirSpotify) {
@@ -193,21 +214,6 @@ class MusicaController extends Controller {
             'anadida_por_id' => Auth::id(),
             'estado_reproduccion' => 'PENDIENTE'
         ]);
-
-        $sugerencia->update(['estado' => 'APROBADA']);
-
-        $sugeridoId = $sugerencia->sugerencia_por_id;
-
-        $sugeridor = User::find($sugeridoId);
-
-        if($sugeridor) {
-            $sugeridor->decrement('puntos', 50);
-            Log::info("Se han descontado 50 puntos del usuario con ID: {$sugeridoId} por la solicitud", [
-                'puntos_actuales' => $sugeridor->puntos
-            ]);
-        } else {
-            Log::warning("No se encontró al usuario con ID: {$sugeridoId} para descontarle los puntos correspondientes");
-        }
 
         return response()->json([
             "message" => "Canción añadida a la playlist",

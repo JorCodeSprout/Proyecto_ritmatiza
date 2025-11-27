@@ -6,8 +6,6 @@ import ActualizarEmail from '../components/ActualizarEmail';
 import MostrarProfesor from '../components/MostrarProfesor';
 import "../assets/styles/Perfil.css";
 import MostrarPuntos from '../components/MostrarPuntos';
-import Footer from '../components/Footer';
-
 
 const DatosPersonales: React.FC = () => {
     const {user} = useAuth();

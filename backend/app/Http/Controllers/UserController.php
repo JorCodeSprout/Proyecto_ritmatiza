@@ -114,7 +114,7 @@ class UserController extends Controller {
 
         if(!$usuario_actualizar) {
             return response()->json([
-                "error" => "Usuario con ID ${id} no encontrado"
+                "error" => `Usuario con ID $id no encontrado`
             ], 404);
         }
 
@@ -127,6 +127,7 @@ class UserController extends Controller {
             'email_confirmation' => 'required_with:email|string',
             'role' => 'sometimes|string',
             'puntos' => 'sometimes|numeric|min:0',
+            'profesor_id' => 'nullable|sometimes|integer|exists:users,id',
         ]);
 
         if($validacion->fails()) {
@@ -138,6 +139,10 @@ class UserController extends Controller {
 
         if($request->filled('name')) {
             $dataActualizar['name'] = $request->name;
+        }
+
+        if($request->filled('email')) {
+            $dataActualizar['email'] = $request->email;
         }
 
         if($user->isProfesor() || $user->isAdmin()) {
@@ -161,6 +166,10 @@ class UserController extends Controller {
                 }
 
                 $dataActualizar['puntos'] = $puntos;
+            }
+
+            if ($request->has('profesor_id')) {
+                $dataActualizar['profesor_id'] = $request->profesor_id;
             }
         }
 

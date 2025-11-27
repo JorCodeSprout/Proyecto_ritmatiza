@@ -35,9 +35,6 @@ const Contacto = () => {
                 body: JSON.stringify({name, email, subject, message})
             });
 
-            console.log(response);
-            
-
             if(!response.ok) {
                 const errData = await response.json().catch(() => ({
                     message: 'Error desconocido del servidor'

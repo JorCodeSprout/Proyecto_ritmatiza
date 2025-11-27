@@ -105,3 +105,21 @@ textarea:not(:placeholder-shown) ~ label {
     left: 5px;
     top: 25px;
 }
+
+.input_container select {
+    background-color: transparent;
+    width: 100%;
+    padding: 10px 10px 10px 5px; 
+    font-size: 14px;
+    margin-top: -15px;
+    display: block;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid grey; 
+    cursor: pointer;
+    color: black; 
+}
+
+.input_container select:first-of-type {
+    margin-top: -20px;
+}

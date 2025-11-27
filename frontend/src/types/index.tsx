@@ -52,6 +52,7 @@ export interface EditarUsuario {
     name?: string;
     puntos?: number;
     role?: string;
+    profesor_id?: number | null;
 }
 
 export interface CrearUsuarioAdminProps {
@@ -225,6 +226,7 @@ export interface EditarPropForm {
     setError: (message: string | null) => void;
     setSuccess: (message: string | null) => void;
     id: string;
+    profesorIdInicial?: number | null;
 }
 
 export interface Profesor {

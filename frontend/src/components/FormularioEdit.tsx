@@ -1,16 +1,17 @@
 import type React from "react";
-import type { EditarPropForm, EditarUsuario } from "../types";
+import { type EditarPropForm, type EditarUsuario, type ProfesorAdmin } from "../types";
 import { useAuth } from "../hooks/useAuth";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from '../assets/styles/Actualizar.module.css'; 
-import { fetchActualizarDatosAdmin } from "../api/perfilAdmin";
+import { fetchActualizarDatosAdmin, fetchProfesores } from "../api/perfilAdmin";
 
 const DATOS_VACIOS = {
     email: '',
     email_confirmation: '',
     name: '',
     puntos: 0,
-    role: ''
+    role: '',
+    profesor_id: null,
 };
 
 const ROLES = [
@@ -21,14 +22,46 @@ const ROLES = [
 
 type Role = 'ADMIN' | 'PROFESOR' | 'ESTUDIANTE';
 
-const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id}) => {
+const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id, profesorIdInicial = null}) => {
     const {token, user} = useAuth();
 
     const [dataForm, setDataForm] = useState<Partial<EditarUsuario>>(DATOS_VACIOS);
     const [loading, setLoading] = useState(false);
+    const [profesorId, setProfesorId] = useState<number | null>(profesorIdInicial);
+    const [profesores, setProfesores] = useState<ProfesorAdmin[]>([]);
+
+    const loadProfesores = useCallback(async () => {
+        if(!token) {
+            return;
+        }
+
+        try {
+            const data = await fetchProfesores(token);
+            setProfesores(data);
+        } catch(err) {
+            console.error("Error al cargar los profesores: ", err);
+            throw err;
+        } 
+    }, [token]);
+
+    useEffect(() => {
+        loadProfesores();
+    }, [loadProfesores]);
 
     const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = e.target;
+        setError(null);
+        setSuccess(null);
+
+        if(name === 'profesorId') {
+            setProfesorId(value ? parseInt(value) : null);
+            return;
+        } else if(name === 'role') {
+            if(value !== 'ESTUDIANTE') {
+                setProfesorId(null);
+            }
+        }
+
         setDataForm(prev => ({
             ...prev,
             [name]: value
@@ -50,20 +83,30 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id}) =>
 
         const data: EditarUsuario = {};
 
-        if(dataForm.email && dataForm.email_confirmation) {
-            if(dataForm.email !== dataForm.email_confirmation) {
+        if (dataForm.email || dataForm.email_confirmation) {
+            if (!dataForm.email || !dataForm.email_confirmation) {
+                setError("Si deseas actualizar el email, debes proporcionar y confirmar ambos campos.");
+                setLoading(false);
+                return;
+            }
+
+            if (dataForm.email !== dataForm.email_confirmation) {
                 setError("El email nuevo y la confirmación no coinciden");
                 setLoading(false);
                 return;
             }
+            
             data.email = dataForm.email;
+            data.email_confirmation = dataForm.email_confirmation;
         }
 
-        if(dataForm.name && dataForm.name.length >= 6) {
-            data.name = dataForm.name;
-        } else {
-            setError("El nombre no ha pasado la verificación. Ha de tener mínimo 6 caracteres");
-            return;
+        if(dataForm.name) {
+            if(dataForm.name.length >= 6) {
+                data.name = dataForm.name;
+            } else {
+                setError("El nombre no ha pasado la verificación. Ha de tener mínimo 6 caracteres");
+                return;
+            }
         }
 
         if(user?.role === "ADMIN" && dataForm.role !== "") {
@@ -74,8 +117,20 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id}) =>
             data.role = dataForm.role;
         } 
 
-        const puntos = dataForm.puntos; // Mantenemos como string/number
+        if(user?.role === "ADMIN" && dataForm.role === "ESTUDIANTE" && !profesorId) {
+            setError("Los estudiantes deben tener un profesor asignado.");
+            setLoading(false);
+            return;
+        }
 
+        if (dataForm.role === "ESTUDIANTE" && profesorId !== undefined) {
+            data.profesor_id = profesorId;
+        } else if (dataForm.role !== "ESTUDIANTE") {
+            data.profesor_id = null; 
+        }
+
+        const puntos = dataForm.puntos;
+        
         if (puntos !== undefined && puntos !== null && puntos !== 0) {
             const puntosNum = Number(puntos);
             if(isNaN(puntosNum) || !Number.isInteger(puntosNum) || puntosNum < 0) {
@@ -84,6 +139,12 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id}) =>
                 return;
             }
             data.puntos = puntosNum;
+        }
+
+        if (Object.keys(data).length === 0) {
+            setError("No se detectaron cambios para actualizar.");
+            setLoading(false);
+            return;
         }
 
         data.id = Number(id);
@@ -163,12 +224,30 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id}) =>
                             id="role" 
                             value={dataForm.role} 
                             onChange={handleChange} 
-                            disabled={loading} 
-                            required>
+                            disabled={loading} >
 
                             <option value="">SELECCIONAR ROL</option>
                             {ROLES.map(r => (
                                 <option value={r} key={r}>{r}</option>
+                            ))}
+
+                        </select>
+                    </div>
+                )}
+
+                {user.role === "ADMIN" && dataForm.role === "ESTUDIANTE" && (
+                    <div className={`${styles.input_container} input-container`}>
+                        <label htmlFor="profesorId"></label> 
+                        <select 
+                            name="profesorId" 
+                            id="profesorId" 
+                            value={profesorId || ''} 
+                            onChange={handleChange} 
+                            disabled={loading}>
+
+                            <option value="">SELECCIONAR PROFESOR</option>
+                            {profesores.map(profesor => (
+                                <option key={profesor.id} value={profesor.id}>{profesor.name} - ({profesor.email})</option>
                             ))}
 
                         </select>

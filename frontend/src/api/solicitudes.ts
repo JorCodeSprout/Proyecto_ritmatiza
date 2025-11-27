@@ -78,7 +78,7 @@ export const fetchAprobarSolicitud = async (token: string | null, sugerenciaID: 
         const data = await response.json();
 
         if(!response.ok) {
-            throw new Error(`Error al aprobar la solicitud: ${response.statusText}`);
+            throw new Error(`Error al aprobar la solicitud: ${data.error}`);
         }
 
         return data.cancion;

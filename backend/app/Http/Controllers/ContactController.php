@@ -33,7 +33,7 @@ class ContactController extends Controller
      *  1. Name --> Cadena de caracteres de no más de 100
      *  2. Email --> Cadena de caracteres en formato email y de no más de 255 caracteres
      *  3. Subject --> Cadena de caracteres de como mínimo 5 caracteres y como máximo 100 caracteres
-     *  4. Message --> Cadena de caracteres de como mínimo 20 caracteres y como máximo 3000 caracteres
+     *  4. Message --> Cadena de caracteres de como máximo 3000 caracteres
      *
      * Este método primero utiliza un trycatch, el cual intenta enviar un mensaje con los datos recibidos gracias a la
      * clase Mail. En el caso de que dicho envío se realice correctamente mostrará un mensaje al usuario notificándole
@@ -45,7 +45,7 @@ class ContactController extends Controller
             "name" => "required|string|min:5|max:100",
             "email" => "required|string|email|max:255",
             "subject" => "required|string|min:5|max:100",
-            "message" => "required|string|min:20|max:3000"
+            "message" => "required|string|max:3000"
         ]);
 
         try {
