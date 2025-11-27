@@ -30,6 +30,7 @@ class CorsMiddleware
 
             'http://localhost:3000',
             'https://localhost:3000',
+            'https://ritmatiza.netlify.app'
         ];
 
         // Obtener el origen de la solicitud
