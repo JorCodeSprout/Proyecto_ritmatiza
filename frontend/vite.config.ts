@@ -14,7 +14,8 @@ export default defineConfig({
     },
     allowedHosts: [
       'ritmatiza.local',
-      'host.docker.internal'
+      'host.docker.internal',
+      'localhost'
     ]
   }
 })

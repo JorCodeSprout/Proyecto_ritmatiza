@@ -55,14 +55,11 @@
 ### --- FIN FRONTEND --- ###
 
 .env
-PRUEBAS_POSTMAN.md
-Los
-Acceso
+README-acceso.md
 certs/
 node_modules
 composer.json
 composer.lock
 vendor
 contraseñas.php
-backup-railway.sql
-ritmatiza.sql
+ritmatiza_db.sql
