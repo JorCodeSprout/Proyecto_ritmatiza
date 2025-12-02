@@ -3,7 +3,7 @@ import type { UsuarioActualizado, ActualizarPropForm } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from "react";
 import { fetchActualizarDatos } from "../api/perfilEstudiante";
-import styles from '../assets/styles/Actualizar.module.css'; 
+import styles from '../assets/styles/Perfil.module.css'; 
 
 const CAMPOS_VACIOS: Partial<UsuarioActualizado> = {
     current_email: '',

@@ -41,20 +41,11 @@
     margin-top: 25px;
 }
 
-.about-section p {
-    margin-bottom: 15px;
-}
-
-.about-section ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin-left: 0;
-}
-
 .about-section ul li {
     background: #e8f5e9;
     padding: 10px 15px;
     margin-bottom: 8px;
+    margin-left: -40px;
     border-left: 5px solid #4CAF50;
     border-radius: 4px;
     font-weight: 500;
@@ -78,10 +69,6 @@
     transition: transform 0.3s;
 }
 
-.step-card:hover {
-    transform: translateY(-5px);
-}
-
 .step-card h4 {
     color: #1a73e8;
     margin-top: 0;
@@ -91,16 +78,46 @@
     font-size: 1.2em;
 }
 
-.note {
-    font-style: italic;
-    color: #666;
-    padding: 10px;
-    border-left: 4px solid #fbc02d;
-    background: #fffbe5;
-    margin-top: 20px;
+
+@media (max-width: 767px) {
+    .ritmatiza-logo {
+        max-width: 200px;
+    }
+
+    .bloque-header-izq h1 {
+        font-size: 1.8em;
+        letter-spacing: 1px;
+        max-width: 100%;
+        text-align: center;
+    }
+    
+    .about-section h2 {
+        font-size: 1.6em; 
+    }
+
+    .about-section h3 {
+        font-size: 1.3em;
+    }
+
+    .process-steps {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .step-card {
+        flex: none;
+        width: 100%;
+        min-width: unset;
+        padding: 15px;
+    }
 }
 
-#titulo_politica {
-    font-size: 2rem;
-    color: #666;
+@media (min-width: 768px) and (max-width: 991px) {
+    .bloque-header-izq h1 {
+        font-size: 2.2em;
+    }
+
+    .step-card {
+        min-width: 30%; 
+    }
 }

@@ -120,7 +120,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
             {error && <p style={{color: "red"}}>{error}</p>}
             {success && <p style={{color: "green"}}>{success}</p>}
 
-            <div className={styles.input_container}>
+            <div className={styles.input_container_crear}>
                 <input 
                     type="text" 
                     name="name" 
@@ -134,7 +134,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="name">Nombre completo *</label>
             </div>
 
-            <div className={styles.input_container}>
+            <div className={styles.input_container_crear}>
                 <input 
                     type="email" 
                     name="email" 
@@ -149,7 +149,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="email">Correo corporativo *</label>
             </div>
 
-            <div className={styles.input_container}>
+            <div className={styles.input_container_crear}>
                 <input 
                     type="password" 
                     name="password" 
@@ -164,7 +164,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="password">Contraseña *</label>
             </div>
 
-            <div className={styles.input_container}>
+            <div className={styles.input_container_crear}>
                 <input 
                     type="password" 
                     name="passwordConfirmation" 
@@ -179,7 +179,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
                 <label htmlFor="passwordConfirmation">Confirmar contraseña *</label>
             </div>
 
-            <div className={`${styles.input_container} input-container`}>
+            <div className={`${styles.input_container_crear} input-container`}>
                 <label htmlFor="role"></label>
                 <select 
                     name="role" 
@@ -198,7 +198,7 @@ const FormularioCreacion: React.FC<CrearUsuarioAdminProps> = ({profesores = []})
             </div>
 
             {role === "ESTUDIANTE" && (
-                <div className={`${styles.input_container} input-container`}>
+                <div className={`${styles.input_container_crear} input-container`}>
                     <label htmlFor="profesorId"></label>
                     <select 
                         name="profesorId" 

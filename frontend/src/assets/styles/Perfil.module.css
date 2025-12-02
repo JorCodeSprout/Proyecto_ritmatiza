@@ -1,0 +1,85 @@
+.formularios, .tarjetas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-left: 300px; 
+}
+
+.tarjeta_profesor, .tarjeta_puntos {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px #3B9AFF;
+    max-width: 400px;
+    margin-top: 20px;
+    max-height: 250px;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.tarjeta_profesor {
+    margin-bottom: 25px;
+    margin-left: 20px;
+    background-color: #fff;
+}
+
+.tarjeta_puntos {
+    margin-left: 20px;
+    margin-bottom: 25px;
+    background-color: #FFE680;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.tarjeta_puntos h3, .tarjeta_puntos h2 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+#botonActualizar {
+    width: 80%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    background-color: #8000D6;
+    color: #fff;
+    margin-top: 15px;
+}
+
+#botonActualizar:hover {
+    background-color: #BE86E4;
+    color: #333;
+}
+
+@media (max-width: 768px) {    
+    .formularios, .tarjetas {
+        grid-template-columns: 1fr !important; 
+        grid-template-rows: auto !important; 
+        width: 100%; 
+        margin-left: 0;
+        right: auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        row-gap: 30px !important;
+    }
+
+    .formularios > div {
+        grid-column: 1 / 1; 
+        margin-bottom: 20px; 
+        width: 100%;
+    }
+
+    .tarjeta_profesor, .tarjeta_puntos {
+        grid-row: auto !important; 
+        max-width: none !important; 
+        width: 100% !important;
+        margin-left: 0 !important; 
+        margin-right: 0 !important;
+        margin-bottom: 20px !important; 
+        grid-column: 1 / -1;
+    }
+}

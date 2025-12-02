@@ -174,7 +174,7 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id, pro
 
     return (
         <>
-            <form onSubmit={handleUpdateDatos}>
+            <form onSubmit={handleUpdateDatos} id={styles.formulario1}>
                 <h2 className={styles.titulo}>Actualizar Usuario</h2>
                 <h3>ID {id}</h3>
                 <div className={styles.input_container}>

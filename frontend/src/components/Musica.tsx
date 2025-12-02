@@ -42,7 +42,7 @@ const Musica: React.FC = () => {
                     Recargar Playlist
                 </button>
                 
-                <div className="playlist_contenedor">
+                <div className={styles.playlist_contenedor}>
                     <iframe key={iframeKey} data-testid="embed-iframe" src={spotifyUrl} width="90%" height="500" allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                 </div>
             </div>

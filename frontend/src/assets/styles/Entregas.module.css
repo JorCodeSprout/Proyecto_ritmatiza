@@ -2,6 +2,13 @@
     overflow-x: hidden;
 }
 
+.entregas_container {
+    margin-left: 300px; 
+    background-color: #F2F8FF;
+    width: auto;
+    padding: 20px; 
+}
+
 .listaEntregas {
     display: grid;
     grid-template-columns: repeat(2, 1fr); 
@@ -13,12 +20,6 @@
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
-}
-
-.entregas_container {
-    margin-left: 300px;
-    background-color: #F2F8FF;
-    width: auto;
 }
 
 .estado_pendiente, .estado_aprobada, .estado_rechazada {
@@ -87,4 +88,37 @@
 
 .btn_suspender:hover {
     background-color: #FF3E3E;
+}
+
+@media (max-width: 768px) {
+    .entregas_container {
+        margin-left: 0; 
+        width: 100%; 
+        padding: 15px; 
+        box-sizing: border-box; 
+    }
+    
+    .listaEntregas {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .estado_pendiente, 
+    .estado_aprobada, 
+    .estado_rechazada {
+        max-width: 100%; 
+        padding: 15px; 
+    }
+    
+    .acciones_calificacion {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .acciones_calificacion button {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+    }
 }

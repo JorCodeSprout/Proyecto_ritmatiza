@@ -20,8 +20,9 @@
 
 .lista_tareas {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 500px));    
+    grid-template-columns: repeat(auto-fit, minmax(300px, 500px)); 
     gap: 20px;
+    padding: 20px; 
 }
 
 .entrega_form {
@@ -135,4 +136,18 @@
     background-color: #c5defa;
     color: #007bff;
     margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+    .tareas_estudiante,
+    .cargando {
+        margin-left: 0; 
+        padding: 10px; 
+    }
+
+    .lista_tareas {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
 }

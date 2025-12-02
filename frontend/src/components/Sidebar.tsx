@@ -4,6 +4,12 @@ import { useAuth } from '../hooks/useAuth';
 import styles from '../assets/styles/Sidebar.module.css'; 
 import type { MenuItem } from '../types';
 
+const MenuIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px">
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+    </svg>
+);
+
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px">
         <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
@@ -19,13 +25,24 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const [adminMenuOpen, setAdminMenuOpen] = useState(false);
     const menuAdmin = useRef<HTMLDivElement>(null);
+    const sidebarRef = useRef<HTMLDivElement>(null);
 
     const handleLogout = () => {
         logout();
         navigate('/');
     }
+
+    const cerrar = () => {
+        setIsSidebarOpen(false);
+    }
+
+    useEffect(() => {
+        cerrar();
+    }, [location.pathname]);
 
     useEffect(() => {
         const handleClick = (event: MouseEvent) => {
@@ -83,86 +100,91 @@ const Sidebar: React.FC = () => {
     }, [isLogged, user?.role]);
 
     return (
-        <div className={styles.sidebar}>
-            <div className={styles.header}>
-                <Link to="/">
-                    <img 
-                        src="/images/RITMATIZA.png"
-                        alt="logo" 
-                        title="RITMATIZA Logo"
-                        className={styles.logo}
-                    />
-                </Link>
-            </div>
+        <>
+            <button className={styles.menuButton} onClick={() => setIsSidebarOpen(prev => !prev)} aria-label='Abrir menú'>
+                <MenuIcon />
+            </button>
+            <div ref={sidebarRef} className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
+                <div className={styles.header}>
+                    <Link to="/" onClick={cerrar}>
+                        <img 
+                            src="/images/RITMATIZA.png"
+                            alt="logo" 
+                            title="RITMATIZA Logo"
+                            className={styles.logo}
+                        />
+                    </Link>
+                </div>
 
-            <nav className={styles.navigation}>
-                <ul>
-                    {menuItems.map((item) => (
-                        <li key={item.id} id={item.id} className={styles.navItem}>
-                            <NavLink to={item.href} className={({isActive}) => 
-                                isActive
-                                    ? `${styles.navLink} ${styles.isActive}`
-                                    : styles.navLink 
-                                }>
-                                {item.name}
-                            </NavLink>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
+                <nav className={styles.navigation}>
+                    <ul>
+                        {menuItems.map((item) => (
+                            <li key={item.id} id={item.id} className={styles.navItem}>
+                                <NavLink to={item.href} className={({isActive}) => 
+                                    isActive
+                                        ? `${styles.navLink} ${styles.isActive}`
+                                        : styles.navLink 
+                                    }>
+                                    {item.name}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
 
-            <div className={styles.footer}>
-                {isLogged ? (
-                    <div ref={menuAdmin}>
-                        {adminMenuOpen && (
-                            <div className={styles.div_boton_admin}>
-                                <button 
-                                    onClick={handleLogout} 
-                                    className={styles.logoutButton}
-                                >
-                                    Cerrar sesión
-                                </button>
+                <div className={styles.footer}>
+                    {isLogged ? (
+                        <div ref={menuAdmin}>
+                            {adminMenuOpen && (
+                                <div className={styles.div_boton_admin}>
+                                    <button 
+                                        onClick={handleLogout} 
+                                        className={styles.logoutButton}
+                                    >
+                                        Cerrar sesión
+                                    </button>
+                                </div>
+                            )}
+
+                            <div onClick={() => setAdminMenuOpen(prev => !prev)} title='Cerrar sesión' className={styles.userProfile}>
+                                {user?.role !== "ADMIN" ? (
+                                    <>
+                                        <UserIcon className={styles.userIconSvg} fill='white' /> 
+                                        <div className={styles.userInfo}>
+                                            <div className={styles.userName}>{user?.name}</div>
+                                            <div className={styles.userRole}>{user?.role}</div>
+                                            <div className={styles.userEmail}>{user?.email}</div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <AdminIcon className={styles.userIconSvg} fill='white' />
+                                        <div className={styles.userInfo}>
+                                            <div className={styles.userName}>{user?.name}</div>
+                                            <div className={styles.userRole}>{user?.role}</div>
+                                            <div className={styles.userEmail}>{user?.email}</div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
-                        )}
-
-                        <div onClick={() => setAdminMenuOpen(prev => !prev)} title='Cerrar sesión' className={styles.userProfile}>
-                            {user?.role !== "ADMIN" ? (
-                                <>
-                                    <UserIcon className={styles.userIconSvg} fill='white' /> 
-                                    <div className={styles.userInfo}>
-                                        <div className={styles.userName}>{user?.name}</div>
-                                        <div className={styles.userRole}>{user?.role}</div>
-                                        <div className={styles.userEmail}>{user?.email}</div>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <AdminIcon className={styles.userIconSvg} fill='white' />
-                                    <div className={styles.userInfo}>
-                                        <div className={styles.userName}>{user?.name}</div>
-                                        <div className={styles.userRole}>{user?.role}</div>
-                                        <div className={styles.userEmail}>{user?.email}</div>
-                                    </div>
-                                </>
+                        </div>
+                    ) : (
+                        <div className={styles.accessLinks}>
+                            {location.pathname !== '/login' && (
+                                <Link to='/login' className={styles.accessButton}>
+                                    Iniciar sesión
+                                </Link>
+                            )}
+                            {location.pathname !== '/register' && (
+                            <Link to='/register' className={styles.accessButton}>
+                                    Registrarse
+                                </Link>
                             )}
                         </div>
-                    </div>
-                ) : (
-                    <div className={styles.accessLinks}>
-                        {location.pathname !== '/login' && (
-                            <Link to='/login' className={styles.accessButton}>
-                                Iniciar sesión
-                            </Link>
-                        )}
-                        {location.pathname !== '/register' && (
-                        <Link to='/register' className={styles.accessButton}>
-                                Registrarse
-                            </Link>
-                        )}
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

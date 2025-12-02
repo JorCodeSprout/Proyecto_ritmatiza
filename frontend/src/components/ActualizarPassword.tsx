@@ -3,7 +3,7 @@ import type { UsuarioActualizado, ActualizarPropForm } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from "react";
 import { fetchActualizarDatos } from "../api/perfilEstudiante";
-import styles from '../assets/styles/Actualizar.module.css'; 
+import styles from '../assets/styles/Perfil.module.css'; 
 
 const CAMPOS_VACIOS: Partial<UsuarioActualizado> = {
     password: '',
@@ -40,21 +40,21 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
 
         const data: UsuarioActualizado = {};
 
-        if(!dataForm.current_email || !dataForm.email || !dataForm.email_confirmation) {
+        if(!dataForm.current_password || !dataForm.password || !dataForm.password_confirmation) {
             setError("Debes llenar todos los campos de contraseña");
             setLoading(false);
             return;
         }
         
-        if(dataForm.email !== dataForm.email_confirmation) {
+        if(dataForm.password !== dataForm.password_confirmation) {
             setError("La contraseña nueva y la confirmación no coinciden");
             setLoading(false);
             return;
         }
 
-        data.current_email = dataForm.current_email;
-        data.email = dataForm.email;
-        data.email_confirmation = dataForm.email_confirmation;
+        data.current_password = dataForm.current_password;
+        data.password = dataForm.password;
+        data.password_confirmation = dataForm.password_confirmation;
 
         try {
             await fetchActualizarDatos(token, data);
@@ -87,7 +87,7 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
                         name="current_password" 
                         id="current_password" 
                         placeholder=" " 
-                        value={dataForm.current_email || ''} 
+                        value={dataForm.current_password || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}
@@ -101,7 +101,7 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
                         name="password" 
                         id="password" 
                         placeholder=" " 
-                        value={dataForm.email || ''} 
+                        value={dataForm.password || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}
@@ -115,7 +115,7 @@ const ActualizarPassword: React.FC<ActualizarPropForm> = ({setError, setSuccess}
                         name="password_confirmation" 
                         id="password_confirmation" 
                         placeholder=" " 
-                        value={dataForm.email_confirmation || ''} 
+                        value={dataForm.password_confirmation || ''} 
                         onChange={handleChange} 
                         required 
                         disabled={loading}

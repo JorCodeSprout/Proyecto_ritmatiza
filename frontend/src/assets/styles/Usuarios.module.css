@@ -1,14 +1,23 @@
 .administrador {
     margin-left: 250px;
     display: grid;
-    grid-template-columns: 500px  1.5fr; 
+    grid-template-columns: 500px  1.5fr; 
 }
 
-.formulario, .contenedor {
-    margin-left: 300px;
+.usuariosForm {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 5px 10px #3B9AFF;
+    max-width: 450px; 
+    width: 90%; 
+    margin-bottom: 50px;
+    margin-left: 280px; 
+    margin-right: 20px;
+    margin-top: 30px;
 }
 
-.input_container select {
+.input_container_crear select {
     background-color: transparent;
     width: 100%;
     padding: 10px 10px 10px 5px; 
@@ -22,19 +31,19 @@
     color: black; 
 }
 
-.input_container select:first-of-type {
+.input_container_crear select:first-of-type {
     margin-top: -20px;
 }
 
-.input_container {
+.input_container_crear {
     position: relative;
     width: 100%;
-    max-width: 300px;
+    max-width: 100%; 
     margin-bottom: 2px;
     padding-top: 20px;
 }
 
-.input_container input {
+.input_container_crear input {
     width: 100%;
     padding: 10px 10px 10px 5px;
     font-size: 14px;
@@ -46,8 +55,8 @@
     border-bottom: 1px solid grey;
 }
 
-.input_container input:focus~label,
-.input_container input:not(:placeholder-shown) ~ label,
+.input_container_crear input:focus~label,
+.input_container_crear input:not(:placeholder-shown) ~ label,
 textarea:not(:placeholder-shown) ~ label {
     border-width: 2px;
     top: 5px;
@@ -63,7 +72,7 @@ textarea:not(:placeholder-shown) ~ label{
     color: #3B9AFF;
 }
 
-.input_container input:focus {
+.input_container_crear input:focus {
     border-width: 2px;
     border-color: #3B9AFF;
 }
@@ -77,9 +86,10 @@ textarea:not(:placeholder-shown) ~ label{
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: 80%;
 }
 
-.input_container label {
+.input_container_crear label {
     position: absolute;
     left: 5px;
     top: 25px;
@@ -167,4 +177,31 @@ tbody td {
 
 tbody tr:hover {
     background-color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .administrador {
+        margin-left: 0;
+        grid-template-columns: 1fr;
+    }
+    
+    .usuariosForm {
+        margin-left: auto;
+        margin-right: auto;
+        width: 95%;
+        max-width: 100%;
+    }
+    
+    .crear {
+        width: 100%;
+    }
+
+    .tabla_card, .tabla_card2 {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .tabla_scroll_container, .tabla_scroll_container2 {
+        overflow-x: auto;
+    }
 }

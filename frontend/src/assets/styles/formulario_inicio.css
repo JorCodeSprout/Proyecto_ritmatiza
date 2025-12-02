@@ -1,9 +1,9 @@
 form {
-    margin: 20px;
+    margin: 20px auto;
     padding: 20px 30px;
     border-radius: 12px;
-    box-shadow: 0 15px 20px #3B9AFF;
-    width: 100%;
+    box-shadow: 0 15px 20px #3B9AFF; 
+    width: 90%; 
     max-width: 400px;
     display: flex;
     flex-direction: column;
@@ -11,13 +11,14 @@ form {
     text-align: center;
     background-color: white;
     color: black;
+    box-sizing: border-box;
 }
 
 .input-container {
     position: relative;
     margin-top: 20px;
     width: 100%;
-    max-width: 300px;
+    max-width: 300px; 
     margin-bottom: 2px;
 }
 
@@ -26,12 +27,12 @@ form {
     padding: 10px 10px 10px 5px;
     font-size: 14px;
     margin-bottom: 10px;
-
     display: block;
     outline: none;
     background: transparent;
     border: none;
     border-bottom: 1px solid grey;
+    box-sizing: border-box;
 }
 
 .input-container input:focus~label,
@@ -54,48 +55,7 @@ textarea:not(:placeholder-shown) ~ label {
     left: 5px;
     top: 8px;
     color: #ccc;
-}
-
-.term-container {
-    margin-bottom: 20px;
-}
-
-input[type="submit"] {
-    width: 80%;
-    height: 30px;
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-}
-
-form p.olvidado {
-    width: 75%;
-    text-align: right;
-    margin-bottom: 12px;
-}
-
-form p.olvidado a {
-    font-size: 0.8rem;
-}
-
-form h2 {
-    margin-bottom: 8px;
-}
-
-form p {
-    color: grey;
-    font-size: 0.9rem;
-    margin-top: 4px;
-    margin-bottom: 12px;
-}
-
-form .iniciar {
-    margin-bottom: 12px;
-}
-
-.submit-btn {
-    background-color: #007bff;
-    color: white;
+    transition: all 0.3s ease;
 }
 
 textarea {
@@ -109,6 +69,26 @@ textarea {
     border: none;
     border-bottom: 1px solid grey;
     resize: none;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    width: 80%;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+form h2 {
+    margin-bottom: 8px;
+}
+
+form p {
+    color: grey;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    margin-bottom: 12px;
 }
 
 #iniciar {
@@ -131,16 +111,40 @@ textarea {
     color: #fff;
 }
 
-.logged-contact-form {
-    margin-left: 300px;
-    margin-top: 50px;
-    height: 600px;
-}
-
 .noLogged {
     display: flex;  
     justify-content: center;
     align-items: center;
-    min-width: 100dvw;
-    width: 100dvw;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.logged-contact-form {
+    margin-left: 300px; 
+    margin-top: 50px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .logged-contact-form {
+        margin-left: 0;
+        margin-top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    form {
+        margin: 20px auto;
+        padding: 15px 20px; 
+        max-width: 90%;
+    }
 }

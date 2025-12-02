@@ -284,7 +284,7 @@ const Home: React.FC = () => {
                     <div className='mainContentStyles logged-in-layout'>
                         <div className='grid-container-profesor'>
                             <div className='grid-item bloque-logged'>
-                                <h1 className='titulo'>{bienvenido}</h1>
+                                <h1 id='titulo'>{bienvenido}</h1>
                                 <p>Gestión y administración de la plataforma.</p>
                                 <Tareas />
                             </div>

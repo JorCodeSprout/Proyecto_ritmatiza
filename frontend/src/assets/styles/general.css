@@ -1,5 +1,6 @@
 * {
     font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
 }
 
 html {
@@ -10,7 +11,7 @@ html {
 
 #body {
     width: 100dvw;
-    overflow-y: hidden;
+    overflow-y: hidden; 
     overflow: hidden;
     margin: 0px;
     padding: 0 20px;
@@ -24,49 +25,61 @@ html {
 }
 
 header {
-    text-align: center;
     border-bottom: 2px solid #c5defa;
-    padding: 2px 0;
+    padding: 10px 40px; 
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 30px;
     margin: 0 auto;
+    position: relative; 
+    z-index: 10;
 }
 
 img {
     height: 50px;
-    margin-right: 50px;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+.menu-toggle {
+    display: none; 
 }
 
 .menu {
-    flex: 1;
+    flex-grow: 1;
     display: flex;
-    justify-content: center;
-    margin-right: 50px;
+    justify-content: center; 
+    margin-right: 0;
+    flex-shrink: 1;
 }
 
 .menu ul {
     display: flex;
     list-style: none;
-    gap: 30px;    
+    gap: 30px; 
     margin: 0;
     padding: 0;
-}
-
-.menu ul li a:hover {
-    color: #007bff;
 }
 
 nav.menu ul li a {
     text-decoration: none;
     color: black;
     font-weight: bold;
+    padding: 10px 0;
+    display: block;
+    white-space: nowrap;
+}
+
+.menu ul li a:hover {
+    color: #007bff;
 }
 
 #acceso {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-shrink: 0;
 }
 
 #acceso button {
@@ -74,6 +87,141 @@ nav.menu ul li a {
     border: none;
     cursor: pointer;
     border-radius: 10px;
+    font-size: 14px; 
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    header {
+        padding: 10px 20px;
+        gap: 15px; 
+    }
+
+    .menu ul {
+        gap: 15px; 
+    }
+    
+    .menu {
+        flex-grow: 0; 
+        justify-content: flex-start;
+    }
+    
+    img {
+        height: 45px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    header {
+        justify-content: space-between;
+        padding: 10px 15px;
+    }
+
+    .menu.active {
+        position: absolute;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        z-index: 9;
+    }
+
+    .menu::-webkit-scrollbar {
+        display: none;
+        width: 0;
+    }
+    
+    .menu-toggle {
+        display: block; 
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 11;
+        width: 40px;
+        padding: 0;
+    }
+
+    .cerrar_menu {
+        position: absolute; 
+        top: 20px; 
+        right: 15px; 
+        z-index: 100;
+        fill: #1a3a5a;
+    }
+
+    .cerrar_menu::hover {
+        background-color: red;
+    }
+    
+    .menu, #acceso {
+        display: none; 
+    }
+    
+    .menu.active {
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+        
+        position: absolute;
+        top: 65px;
+        right: 0;
+        left: auto;
+        width: 87%;
+        background-color: white; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 9; 
+        margin: 0;
+    }
+
+    .menu ul {
+        flex-direction: column;
+        margin-top: 50px; 
+        width: 100%;
+        text-align: center;
+        gap: 0; 
+    }
+
+    .menu ul li {
+        width: 100%;
+        border-bottom: 1px solid #eee;
+    }
+
+    .menu ul li:last-child {
+        border-bottom: none;
+    }
+    
+    nav.menu ul li a {
+        padding: 15px 20px;
+    }
+
+    .menu.active + #acceso {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 10px 0 20px 0;
+        border-top: 1px solid #eee;
+        
+        position: static; 
+        z-index: 9;
+        background-color: white;
+    }
+
+    #acceso .user-icon {
+        display: flex; 
+        order: -1; 
+    }
+    
+    .menu-open #acceso {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+        position: static;
+        box-shadow: none;
+    }
 }
 
 #iniciar_sesion {

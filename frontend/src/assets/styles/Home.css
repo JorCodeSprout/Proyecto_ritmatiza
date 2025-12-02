@@ -263,3 +263,61 @@ span {
     background-color: #e6f7ff;
     border: 1px solid #0099ff;
 }
+
+@media (max-width: 768px) {
+    #body {
+        margin-left: 0; 
+        padding-top: 60px; 
+        width: 100dvw;
+        overflow-y: auto; 
+        overflow-x: hidden;
+    }
+
+    .grid-container-logout, 
+    .grid-container-profesor, 
+    .grid-container-estudiante {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 0;
+        margin-top: 40px;
+        align-items: start;
+        width: 90%;
+    }
+    
+    .grid-item.bloque-logged {
+        width: 90%;
+        margin-bottom: 10px;
+        text-align: left;
+        display: flex;
+        margin-left: 0;
+        flex-direction: column;
+        align-items: end;
+    }
+    
+    .grid-item #titulo,
+    .grid-item.bloque-logged h1 {
+        text-align: left;
+        width: 100%; 
+        line-height: 1.2;
+        font-size: 2rem;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    .bloque-logued {
+        margin-left: 0 !important;
+    }
+
+    
+    .grid-item.bloque-logged p {
+        text-align: left;
+        margin: 5px 0 10px 0;
+    }
+}

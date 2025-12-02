@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import ActualizarPassword from '../components/ActualizarPassword';
 import ActualizarEmail from '../components/ActualizarEmail';
 import MostrarProfesor from '../components/MostrarProfesor';
-import "../assets/styles/Perfil.css";
+import styles from "../assets/styles/Perfil.module.css";
 import MostrarPuntos from '../components/MostrarPuntos';
 
 const DatosPersonales: React.FC = () => {
@@ -16,7 +16,7 @@ const DatosPersonales: React.FC = () => {
     return (
         <div>
             <Sidebar/>
-            <div id="body"  className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <div id="body">
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
                         {error}
@@ -30,7 +30,7 @@ const DatosPersonales: React.FC = () => {
 
                 {user?.role !== "ADMIN" && (
                     <>
-                        <div className='formularios'>
+                        <div className={styles.formularios}>
                             <div>
                                 <ActualizarEmail setError={setError} setSuccess={setSuccess} />
                             </div>
@@ -40,12 +40,12 @@ const DatosPersonales: React.FC = () => {
                             </div>
                         </div>
                     {user?.role !== "PROFESOR" && (
-                        <div className="tarjetas">
-                            <div className='tarjeta_profesor'>
+                        <div className={styles.tarjetas}>
+                            <div className={styles.tarjeta_profesor}>
                                 <MostrarProfesor />
                             </div>
 
-                            <div className='tarjeta_puntos'>
+                            <div className={styles.tarjeta_puntos}>
                                 <MostrarPuntos />
                             </div>
                         </div>

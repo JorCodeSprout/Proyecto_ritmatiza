@@ -1,12 +1,27 @@
 .buscador, .mensajes {
     margin-left: 300px;
+    margin-right: 50px;
+    padding-top: 20px;
+}
+
+.container {
+    margin-left: 300px; 
+    margin-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+
+.resultadosContainer {
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
 }
 
 .input_container {
     position: relative;
     margin-top: 20px;
     width: 100%;
-    max-width: 300px;
+    max-width: 350px; 
     margin-bottom: 2px;
 }
 
@@ -42,19 +57,6 @@
     transition: 0.2s ease all;
     pointer-events: none;
     color: #ccc;
-}
-
-.container {
-    margin-left: 300px;
-    margin-right: 50px;
-}
-
-.resultadosContainer {
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 20px; 
-    padding-top: 20px;
-    padding-bottom: 50px;
 }
 
 .cancionCard {
@@ -135,7 +137,7 @@
     color: #fff;
 }
 
-.sugerirButton, .conseguirPuntos  {
+.sugerirButton, .conseguirPuntos {
     width: 100%; 
     padding: 12px;
     border: none;
@@ -165,4 +167,26 @@
 .conseguirPuntos:hover {
     background-color: #BE86E4; 
     color: #000;
+}
+
+@media (max-width: 1199px) {
+    .resultadosContainer {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+
+@media (max-width: 767px) {
+    .buscador, .mensajes {
+        margin-left: 20px; 
+        margin-right: 20px;
+    }
+    
+    .container {
+        margin-left: 20px; 
+        margin-right: 20px;
+    }
+
+    .resultadosContainer {
+        grid-template-columns: repeat(1, 1fr); 
+    }
 }

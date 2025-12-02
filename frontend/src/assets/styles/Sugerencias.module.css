@@ -1,5 +1,24 @@
 .sugerenciasTitulo {
+    margin-left: 0;
+    padding-left: 30px; 
+    padding-right: 30px;
     margin-left: 300px;
+}
+
+.contenedor {
+    margin-left: 300px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0 30px;
+}
+
+.resultadosContainer {
+    margin-left: 300px;
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    padding-top: 20px;
+    padding-bottom: 50px;
 }
 
 .APROBADA {
@@ -12,19 +31,6 @@
 
 .PENDIENTE {
     border-top: 20px solid #FFE88E;
-}
-
-.contenedor {
-    margin-left: 300px;
-    margin-right: 50px;
-}
-
-.resultadosContainer {
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 20px; 
-    padding-top: 20px;
-    padding-bottom: 50px;
 }
 
 .cancionCard {
@@ -84,8 +90,9 @@
 }
 
 .escucharButton {
-    display: block; 
+    display: flex;
     justify-content: center;
+    align-items: center;
     width: 50%; 
     text-align: center;
     padding: 8px 12px;
@@ -109,11 +116,17 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     margin-bottom: 20px;
+    width: 100%;
+    padding: 0 15px 15px 15px;
 }
 
 .acciones_solicitud button {
     transform: scale(1);
     border: none;
+    padding: 10px 5px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .aceptar {
@@ -132,4 +145,49 @@
 
 .rechazar:hover {
     background-color: #FF3E3E;
+}
+
+@media (max-width: 1200px) {
+    .sugerenciasTitulo,
+    .contenedor {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .resultadosContainer {
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sugerenciasTitulo, 
+    .contenedor, 
+    .resultadosContainer {
+        margin-left: 0;
+    }
+
+    .sugerenciasTitulo,
+    .contenedor {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .resultadosContainer {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .cancionCard {
+        width: 90%;
+        margin: 0 auto;
+    }
+    
+    .escucharButton {
+        width: 70%;
+    }
+
+    .acciones_solicitud {
+        gap: 10px;
+    }
 }
