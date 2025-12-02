@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -89,8 +90,16 @@ class MusicaController extends Controller {
      * la sugerencia enviada.
      */
     public function sugerirCancion(Request $request) {
-        if (!Auth::check()) {
+        $user = Auth::user();
+
+        if (!$user) {
             return response()->json(['message' => 'No autorizado. Se requiere un token válido.'], 401);
+        }
+
+        if($user->puntos < 50) {
+            return response()->json([
+                'error' => 'No tienes puntos suficientes para solicitar otra canción'
+            ], 403);
         }
 
         $validado = Validator::make($request->all(), [
@@ -103,15 +112,29 @@ class MusicaController extends Controller {
             return response()->json($validado->errors(), 422);
         }
 
-        $sugerencia = Sugerencia::create([
-            'id_spotify_cancion' => $request->id_spotify_cancion,
-            'titulo' => $request->titulo,
-            'artista' => $request->artista,
-            'sugerencia_por_id' => Auth::id(),
-            'estado' => 'PENDIENTE',
-        ]);
+        try {
+            DB::beginTransaction(); 
 
-        return response()->json(['message' => 'Sugerencia enviada para revisión', 'sugerencia' => $sugerencia], 201);
+            $sugerencia = Sugerencia::create([
+                'id_spotify_cancion' => $request->id_spotify_cancion,
+                'titulo' => $request->titulo,
+                'artista' => $request->artista,
+                'sugerencia_por_id' => Auth::id(),
+                'estado' => 'PENDIENTE',
+            ]);
+
+            $user->puntos -= 50;
+            $user->save();
+
+            DB::commit(); 
+
+            return response()->json(['message' => 'Sugerencia enviada para revisión', 'sugerencia' => $sugerencia], 201);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Error al sugerir canción (transacción): " . $e->getMessage());
+            return response()->json(['error' => 'Error interno al procesar la sugerencia.'], 500);
+        }
     }
 
     /*
@@ -174,27 +197,6 @@ class MusicaController extends Controller {
         $playlistId = config('services.spotify.playlist_id');
         $trackUri = "spotify:track:{$sugerencia->id_spotify_cancion}";
 
-        $sugeridoId = $sugerencia->sugerencia_por_id;
-
-        $sugeridor = User::find($sugeridoId);
-
-        if($sugeridor) {
-            if($sugeridor->puntos < 50) {
-                return response()->json([
-                    'error' => 'El usuario que realizó la solicitud no tiene suficientes puntos'
-                ], 403);
-            }
-            
-            $sugeridor->decrement('puntos', 50);
-            Log::info("Se han descontado 50 puntos del usuario con ID: {$sugeridoId} por la solicitud", [
-                'puntos_actuales' => $sugeridor->puntos
-            ]);
-        } else {
-            Log::warning("No se encontró al usuario con ID: {$sugeridoId} para descontarle los puntos correspondientes");
-        }
-
-        $sugerencia->update(['estado' => 'APROBADA']);
-
         $anadirSpotify = $this->spotifyApiService->anadirCancion($trackUri, $playlistId, $token);
 
         if(!$anadirSpotify) {
@@ -206,6 +208,8 @@ class MusicaController extends Controller {
                 'error' => 'Fallo al añadir la canción a Spotify'
             ], 503);
         }
+
+        $sugerencia->update(['estado' => 'APROBADA']);
 
         $cancionAnadida = CancionPlaylist::create([
             'id_spotify' => $sugerencia->id_spotify_cancion,
@@ -237,6 +241,19 @@ class MusicaController extends Controller {
         }
 
         $sugerencia->update(['estado' => 'RECHAZADA']);
+
+        $sugeridoId = $sugerencia->sugerencia_por_id;
+
+        $sugeridor = User::find($sugeridoId);
+
+        if($sugeridor) {
+            $sugeridor->increment('puntos', 50);
+            Log::info("Se han devuelto los 50 puntos por la sugerencia cancelada al usuario con ID: {$sugeridoId}.", [
+                'puntos_actuales' => $sugeridor->puntos
+            ]);
+        } else {
+            Log::warning("No se encontró al usuario con ID: {$sugeridoId} para descontarle los puntos correspondientes");
+        }
 
         return response()->json([
             "message" => "Sugerencia rechazada correctamente",

@@ -123,10 +123,15 @@ const FormularioEdit: React.FC<EditarPropForm> = ({setError, setSuccess, id, pro
             return;
         }
 
-        if (dataForm.role === "ESTUDIANTE" && profesorId !== undefined) {
+        if (dataForm.role === "ESTUDIANTE") {
+            if (!profesorId) {
+                setError("Los estudiantes deben tener un profesor asignado.");
+                setLoading(false);
+                return;
+            }
             data.profesor_id = profesorId;
-        } else if (dataForm.role !== "ESTUDIANTE") {
-            data.profesor_id = null; 
+        } else if (dataForm.role !== "" && dataForm.role !== "ESTUDIANTE") {
+            data.profesor_id = null;
         }
 
         const puntos = dataForm.puntos;
