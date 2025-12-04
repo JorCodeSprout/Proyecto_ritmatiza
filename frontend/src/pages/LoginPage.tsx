@@ -19,9 +19,7 @@ const LoginPage: React.FC = () => {
     const {login} = useAuth();
     const navigate = useNavigate();
 
-    const handleLoginSuccess = useCallback((apiToken: string, user: User) => {
-        console.log("Login exitoso. Nombre del usuario: ", user)
-        
+    const handleLoginSuccess = useCallback((apiToken: string, user: User) => {        
         login(apiToken, user); 
         navigate('/');
     }, [login, navigate]);

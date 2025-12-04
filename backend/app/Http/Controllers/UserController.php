@@ -255,8 +255,8 @@ class UserController extends Controller {
 
             // Comprobar que realmente ese usuario es profesor
             $profesor = User::find($request->profesor_id);
-            if(!$profesor || ($profesor->isProfesor() && !$profesor->isAdmin())) {
-                return response()->json(["error" => "El ID proporcionado no pertenece a un profesor o administrador"], 422);
+            if(!$profesor || (!$profesor->isProfesor() && !$profesor->isAdmin())) {
+                return response()->json(["error" => "El ID proporcionado no pertenece a un profesor o administrador" . $request->profesor_id], 422);
             }
 
             $datosUsuario["profesor_id"] = $request->profesor_id;

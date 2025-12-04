@@ -18,7 +18,6 @@ const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLoginSuccess = useCallback((apiToken: string, user: User) => {
-        console.log("Login exitoso. Nombre del usuario: ", user.name)
         login(apiToken, user);
         navigate('/');
     }, [login, navigate]);
