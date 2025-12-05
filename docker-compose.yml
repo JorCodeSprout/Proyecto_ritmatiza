@@ -6,7 +6,6 @@ services:
       dockerfile: docker/php/Dockerfile
     container_name: ritmatiza_app
     restart: always
-    # Los comandos de permisos son críticos para Laravel
     command: [ "sh", "-c", "chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache && chmod +x /var/www/html/public/index.php /var/www/html/artisan && exec docker-php-entrypoint php-fpm" ]
     expose:
       - "9000"
@@ -26,11 +25,29 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" 
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "80:80"
+      # - "443:443"
     volumes:
       - ./backend/public:/var/www/html/public
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/ssl:/etc/nginx/ssl
     depends_on:
       - app
+
+  # Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: ritmatiza_db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ritmatiza_db_data:/var/lib/mysql
+
+volumes:
+  ritmatiza_db_data:

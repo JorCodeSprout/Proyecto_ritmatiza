@@ -2,7 +2,17 @@
 
 ## Introducción
 
-Ritmatiza es un proyecto que comenzó como una manera de motivar a los estudiantes a que se esfuercen en realizar las tareas. Esta aplicación consiste en un servicio de entrega de trabajos para obtener puntos, para posteriormente gastarlos en la solicitud de canciones para solicitar que pongan su canción favorita en los recreos.
+Ritmatiza es un proyecto que comenzó como una manera de motivar a los estudiantes a que se esfuercen en realizar las tareas. Esta aplicación consiste en un servicio de entrega de trabajos para obtener puntos, para posteriormente gastarlos en la solicitud de canciones para solicitar que pongan su canción favorita en los recreos. 
+
+## Datos a tener en cuenta
+
+Para este proyecto se ha utilizado la configuración del archivo /etc/hosts y añadido la línea `127.0.0.1 localhost ritmatiza.local`. 
+
+En el caso de querer importar la base de datos utilizada de manera local, se podrá importar el script sql `ritmatiza_db.sql`. Para ello simplemente tendremos que pegar el script introducido en el .zip entregado y posteriormente ejecutar el siguiente comando en la terminal desde la raíz del proyecto:
+
+```bash
+mysql -u <usuario> -p <nombre_bbdd> < ritmatiza_db.sql
+```
 
 ## Despliegue
 
@@ -12,7 +22,7 @@ Este proyecto utiliza contenedores de Docker para servir los servicios, y su des
 
 Asegúrate de tener instalado Git, Docker y Docker Compose.
 
-### Pasos a seguir - Windows
+### Pasos a seguir
 
 #### Clonar repositorio
 
@@ -22,32 +32,60 @@ git clone https://github.com/JorCodeSprout/Proyecto_ritmatiza.git
 cd Proyecto_ritmatiza
 ```
 
-#### Script de inicio
+#### Archivo .env
 
-Simplemente ejecutando el siguiente script en la terminal hará que se levante los contenedores, ajustará los permisos de Laravel y ejecutará el servidor de desarrollo en Vite. 
-
-```bash
-./start.bat
-```
-
-### Pasos a seguir - Linux/macOS
-
-#### Clonar repositorio
+Para poder levantar los contenedores de Docker es necesario configurar nuestro `.env` y añadir las siguientes líneas. Los valores de dichas variables, estarán en un README de acceso enviado a los profesores para este proyecto, para que de esta manera se puedan conectar a la base de datos que está desplegada. Para obtener esas variables simplemente hay que acceder a [este archivo](./README-acceso.md).
 
 ```bash
-git clone https://github.com/JorCodeSprout/Proyecto_ritmatiza.git
-
-cd Proyecto_ritmatiza
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=ritmatiza
+DB_USERNAME=<usuario>
+DB_PASSWORD=<contraseña>
 ```
 
 #### Levantar contenedores
 
-Dado que el `start.bat` está previsto para usuarios en Windows, en Linux y macOS el proceso es un poco más tedioso. Una vez en el directorio del respositorio tendremos que ejecutar el siguiente comando para levantar los contenedores:
+Una vez en el directorio del respositorio tendremos que ejecutar el siguiente comando para levantar los contenedores:
 
 ```bash
 docker compose up --build -d
 
 docker compose ps  # Para asegurarnos que los contenedores están correctamente levantados
+```
+
+#### Instalar dependencias de PHP
+
+Para instalar las dependencias del backend será necesario ejecutar el siguiente comando:
+
+```bash
+docker compose exec app composer install
+```
+
+#### Generar Clave de aplicación
+
+Una vez instaladas las dependencias procedemos a copiar el contenido del ./backend/.env.example en el archivo ./backend/.env
+
+```bash
+copy ./backend/.env.example ./backend/.env # Para Linux/macOS - Windows => cp en vez de copy
+docker compose exec app php artisan key:generate
+```
+
+#### Generar clave JWT para controlar token
+
+Para esta aplicación es necesaria una clave JWT para firmar digitalmente el token cuando se inicia sesión.
+
+```bash
+docker compose exec app php artisan jwt:secret
+```
+
+#### Ejecutar las migraciones
+
+Antes de migrar la base de datos tenemos que añadir las variables que creamos en el primer paso despues de clonar el repositorio para que se cree la base de datos si no existe.
+
+```bash
+docker compose exec app php artisan migrate --seed
 ```
 
 #### Ajustar permisos
@@ -70,6 +108,46 @@ npm install  # Instalar las dependencias por primera vez
 npm run dev
 ```
 
+#### .env
+
+Una vez estén todos los contenedores levantados correctamente, procederemos a añadir las variables de entorno necesarias para la conexión con la API de Spotify y de Mailer, haciendo que finalmente el .env quede algo similar a esto:
+
+```bash
+APP_NAME="Ritmatiza Local"
+APP_ENV=local
+APP_KEY= 
+APP_DEBUG=false 
+APP_URL=http://ritmatiza.local
+
+# Variables de entorno Docker Compose y MySQL
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=ritmatiza
+DB_USERNAME=<usuario>
+DB_PASSWORD=<contraseña>
+
+# Spotify API - Sustituye con tus credenciales
+SPOTIFY_CLIENT_ID=<client_id_spotify_dev>
+SPOTIFY_CLIENT_SECRET=<client_secret_spotify_dev>
+SPOTIFY_REDIRECT_URI=${APP_URL}/api/spotify/callback
+SPOTIFY_PLAYLIST_ID=<id_playlist_spotify>
+
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=<email@email.com>
+MAIL_PASSWORD="app password"
+MAIL_FROM_ADDRESS="<email@email.com>"
+MAIL_FROM_NAME="${APP_NAME}"
+
+JWT_SECRET=<clave_JWT_token>
+```
+
+(En el .zip recibido pueden coger el .env que hay en tanto en ./backend como en el directorio raíz para poder realizar las pruebas necesarias).
+
 ### Acceso
 
 Una vez hecho esto si acceden a [http://localhost]([http://localhost]) podrán ver la aplicación desplegada en local.
@@ -87,3 +165,7 @@ Además hay que ir a la terminar y pulsar `CTRL + C` para detener el servicio de
 ## Datos extra
 
 Para este apartado es necesario haber recibido un archivo .zip por parte del creador de la aplicación con los detalles relevantes para comprobar de manera correcta la aplicación. Una vez obtenido simplemente habrá que abrir el archivo **[README](./README-acceso.md)**.
+
+## Acceso desde el navegador
+
+Este proyecto está desplegado con Hostinger y VPS. La url de acceso es [ritmatiza.site](https://ritmatiza.site)
