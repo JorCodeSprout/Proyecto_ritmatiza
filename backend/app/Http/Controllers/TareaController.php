@@ -90,7 +90,7 @@ class TareaController extends Controller {
      * pasa a tener un estado PENDIENTE y éste se mantendrá hasta que algún profesor o admin la corrija.
      * La ruta debe ser un archivo File. Si pasa la validación y la entrega se crea de forma correcta,
      * se mostrará un mensaje de confirmación. En el caso de que la validación falle, se mostrará un mensaje 422.
-     * 
+     *
      * Una vez que se muestra el mensaje de confirmación, podremos encontrar el archivo en ritmatiza/backend/storage/app/public/uploads/entregas.
      */
     public function subirEntrega(Request $request, Tarea $tarea) {
@@ -180,20 +180,20 @@ class TareaController extends Controller {
      * EntregasPorTarea
      * ============================
      * En este caso es obligatorio ser admin o profesor y en caso de no serlo se te mostrará un mensaje de error de
-     * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes y 
+     * permisos. Si pasas este requisito, se te mostrarán todas las entregas realizadas por los estudiantes y
      * que aun no hayan sido corregidas. La devolución de este método consiste en un objeto JSON con todas las entregas.
      */
     public function entregasPorTarea($creador_id) {
         if(Gate::denies('profesor-or-admin')) {
             return response()->json(['error' => 'No tienes permiso para ver todas las entregas'], 403);
         }
-        
+
         $entregas = Entrega::join('tareas', 'entregas.tarea_id', '=', 'tareas.id')
             ->where('tareas.creador_id', $creador_id)
             ->where('entregas.estado', 'PENDIENTE')
             ->select('entregas.*', 'tareas.titulo as tarea_titulo', 'tareas.recompensa as tarea_recompensa')
             ->get();
-            
+
         return response()->json($entregas);
     }
 
@@ -209,7 +209,7 @@ class TareaController extends Controller {
             ->where('estudiante_id', $user->id)
             ->select('entregas.*', 'tareas.titulo as tarea_titulo', 'tareas.recompensa as tarea_recompensa')
             ->get();
-            
+
         return response()->json($entregas);
     }
 
@@ -259,5 +259,26 @@ class TareaController extends Controller {
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /*
+     * DescargarEntrega
+     * ====================================
+     * Permite descargar un archivo de entrega específico.
+     * Solo accesible para profesores o administradores.
+     */
+    public function descargarEntrega(Entrega $entrega) {
+        if(Gate::denies('profesor-or-admin')) {
+            return response()->json(['error' => 'No tienes permiso para descargar el archivo'], 403);
+        }
+
+        $ruta = $entrega->ruta;
+
+        if(Storage::disk('public')->exists($ruta)) {
+            $nombreArchivo = basename($ruta);
+            return Storage::disk('public')->download($ruta, $nombreArchivo);
+        }
+
+        return response()->json(['error' => 'Archivo no encontrado'], 404);
     }
 }

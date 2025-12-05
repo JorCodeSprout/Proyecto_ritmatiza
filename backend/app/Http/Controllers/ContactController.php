@@ -49,8 +49,7 @@ class ContactController extends Controller
         ]);
 
         try {
-            $emailRecepcion = env('MAIL_USERNAME', "pruebasjorgead@gmail.com");
-            Mail::to($emailRecepcion)->send(new SendContactForm($dataValidate));
+            $emailRecepcion = Config::get('MAIL_USERNAME', "pruebasjorgead@gmail.com");
 
             return response()->json([
                 'message' => '¡Mensaje enviado con éxito!',

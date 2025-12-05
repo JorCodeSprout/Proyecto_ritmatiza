@@ -11,6 +11,7 @@ export default defineConfig({
     hmr: {
       host: 'ritmatiza.local',
       clientPort: 443,
+      protocol: 'wss'
     },
     allowedHosts: [
       'ritmatiza.local',

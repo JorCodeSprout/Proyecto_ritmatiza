@@ -90,6 +90,16 @@
     background-color: #FF3E3E;
 }
 
+.btn_descargar {
+    background-color: #8000D6;
+    color: white;
+}
+
+.btn_descargar:hover {
+    background-color: #BE86E4;
+    color: #333;
+}
+
 @media (max-width: 768px) {
     .entregas_container {
         margin-left: 0; 

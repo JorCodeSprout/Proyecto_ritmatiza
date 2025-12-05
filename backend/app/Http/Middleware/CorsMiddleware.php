@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Closure;
 
 class CorsMiddleware
@@ -15,6 +16,12 @@ class CorsMiddleware
      */
     public function handle($request, Closure $next)
     {
+        $response = $next($request);
+
+        if($response instanceof StreamedResponse) {
+            return $response;
+        }
+
         // Define los orígenes permitidos
         $allowedOrigins = [
             // Orígenes del Frontend (React/Vite)
@@ -30,7 +37,8 @@ class CorsMiddleware
 
             'http://localhost:3000',
             'https://localhost:3000',
-            'https://ritmatiza.netlify.app'
+            'https://ritmatiza.netlify.app',
+            'http://ritmatiza.site',
         ];
 
         // Obtener el origen de la solicitud

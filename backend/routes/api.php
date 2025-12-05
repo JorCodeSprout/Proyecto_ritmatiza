@@ -15,10 +15,21 @@ use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'API is working! Traffic confirmed via Laravel API routes.',
+    ]);
+});
+
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register')->name('register');
     Route::post('login', 'login')->name('login');
+});
+
+Route::get('/test', function() {
+    return response()->json(['status' => 'API is running seccessfully!']);
 });
 
 Route::get('tareas/ultimas', [TareaController::class, 'ultimasTareas']);
@@ -69,6 +80,7 @@ Route::middleware('auth:api')->group(function () {
 
         // Calificar tarea
         Route::post('entregas/{entrega}/calificar', [TareaController::class, 'calificarEntrega']);
+        Route::get('entregas/{entrega}/descargar', [TareaController::class, 'descargarEntrega']);
 
         Route::controller(UserController::class)->prefix("/usuario")->group(function () {
             Route::get("/all", "obtenerUsuarios");

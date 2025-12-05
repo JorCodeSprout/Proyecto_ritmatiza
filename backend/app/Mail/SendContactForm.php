@@ -43,6 +43,8 @@ class SendContactForm extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
+            from: new Address(env('MAIL_USERNAME', 'pruebasjorgead@gmail.com')),
+
             replyTo: [
                 new Address($this->formData['email'], $this->formData['name']),
             ],
