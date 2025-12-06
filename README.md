@@ -160,7 +160,7 @@ Una vez se han visto todos los detalles de la aplicación y se quiera detener el
 docker compose down
 ```
 
-Además hay que ir a la terminar y pulsar `CTRL + C` para detener el servicio de Vite en caso de Linux/macOS o simplemente cerrar la ventana de terminal donde se ejecutó el `start.bat` en Windows.
+Además hay que ir a la terminar y pulsar `CTRL + C` para detener el servicio de Vite.
 
 ## Datos extra
 
