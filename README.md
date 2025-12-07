@@ -146,6 +146,12 @@ MAIL_FROM_NAME="${APP_NAME}"
 JWT_SECRET=<clave_JWT_token>
 ```
 
+### Makefile
+
+En caso de preferirse se da la opción de ejecutar un solo comando que hace todo lo anteriormente nombrado y dicho comando es `make up`, el cual se encargará de levantar los contenedores, la configuración inicial instalando las dependencias necesarias de PHP, copiar el archivo de configuración `.env.example` a `.env`, generar las claves tanto de aplicación como la clave JWT, ejecuta las migraciónes y seeders para configurar las tablas y los datos iniciales y por último configura los permisos necesarios y crea el enlace de almacentamiento con `php artisan storage:link`.
+
+Una vez se quiera detener la aplicación se puede utilizar el comando `make down` o `make clear` para limpiar de manera completa los contenedores y los volúmenes de datos asociados a la base de datos.
+
 (En el .zip recibido pueden coger el .env que hay en tanto en ./backend como en el directorio raíz para poder realizar las pruebas necesarias).
 
 ### Acceso
